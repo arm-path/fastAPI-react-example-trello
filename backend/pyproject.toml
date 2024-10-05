@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "backend"
+version = "0.1.0"
+description = ""
+authors = ["Rinat Ahtyamov <arm.developer@outlook.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+fastapi = {extras = ["all"], version = "^0.115.0"}
+sqlalchemy = "^2.0.35"
+alembic = "^1.13.3"
+asyncpg = "^0.29.0"
+psycopg2 = "^2.9.9"
+pydantic-settings = "^2.5.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
