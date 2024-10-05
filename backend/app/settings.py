@@ -8,6 +8,8 @@ class Settings(BaseSettings):
     POSTGRES_PASSWORD: str
     POSTGRES_DB: str
     DATABASE_ECHO: bool
+    AUTH_SECRET_JWT: str
+    AUTH_LIFETIME_SECONDS_JWT: int
 
     DATABASE_CONVENTION: dict[str, str] = {
         'ix': 'ix_%(column_0_label)s',
