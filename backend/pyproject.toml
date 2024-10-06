@@ -13,6 +13,7 @@ asyncpg = "^0.29.0"
 psycopg2 = "^2.9.9"
 pydantic-settings = "^2.5.2"
 fastapi-users = {extras = ["sqlalchemy"], version = "^13.0.0"}
+fastapi-pagination = "^0.12.29"
 
 
 
