@@ -7,7 +7,7 @@ from app.users.manager import get_user_manager
 from app.users.schemas import UserRead, UserCreate
 
 router = APIRouter(
-    prefix='auth/',
+    prefix='/auth',
     tags = ['Authentication']
 )
 
@@ -17,11 +17,13 @@ fastapi_users = FastAPIUsers[User, int](
 )
 
 router.include_router(
-    fastapi_users.get_auth_router(auth_backend),
-    prefix='/jwt'
+    fastapi_users.get_auth_router(auth_backend)
 )
 
 router.include_router(
-    fastapi_users.get_register_router(UserRead, UserCreate),
-    prefix='/registration',
+    fastapi_users.get_register_router(UserRead, UserCreate)
+)
+
+router.include_router(
+    fastapi_users.get_verify_router(UserRead),
 )
