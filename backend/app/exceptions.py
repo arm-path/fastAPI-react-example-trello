@@ -35,3 +35,9 @@ MultipleResultsFoundException = HTTPException(
     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
     detail={'msg': 'Multiple results found'}
 )
+
+# Dashboard
+ProjectNotFoundException = HTTPException(
+    status_code=status.HTTP_404_NOT_FOUND,
+    detail={'msg': 'Project not found'}
+)

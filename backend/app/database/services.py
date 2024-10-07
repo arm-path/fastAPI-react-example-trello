@@ -2,7 +2,7 @@ from typing import List
 
 from asyncpg import UniqueViolationError, ForeignKeyViolationError, UndefinedFunctionError
 from fastapi_pagination.ext.sqlalchemy import paginate
-from sqlalchemy import Select, select, Result, Insert, insert, Update, update
+from sqlalchemy import Select, select, Result, Insert, insert, Update, update, delete, Delete
 from sqlalchemy.exc import IntegrityError, InvalidRequestError, ProgrammingError, MultipleResultsFound
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -96,3 +96,12 @@ class DatabaseService:
         except Exception as e:
             raise DatabaseException
         return model
+
+    @classmethod
+    async def delete(cls, session: AsyncSession, filters: dict):
+        stmt: Delete = (
+            delete(cls.model)
+            .filter_by(**filters)
+        )
+        await session.execute(stmt)
+        await session.commit()

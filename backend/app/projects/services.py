@@ -22,6 +22,11 @@ class ProjectService(DatabaseService):
         return await cls.update(session, filters=filters, values=values)
 
     @classmethod
+    async def delete_project(cls, session: AsyncSession, user: UserRead, project_id: int) -> None:
+        filters = {'user_id': user.id, 'id': project_id}
+        await  cls.delete(session, filters)
+
+    @classmethod
     async def get_projects(cls, session: AsyncSession, user: UserRead):
         filters = {'user_id': user.id}
         return await cls.get_list(session, filters)

@@ -1,6 +1,6 @@
 from typing import Annotated, List
 
-from fastapi import APIRouter
+from fastapi import APIRouter, status
 from fastapi.params import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -28,6 +28,13 @@ async def update_project(user: Annotated[UserRead, Depends(current_user)],
                          session: Annotated[AsyncSession, Depends(db_settings.get_session)],
                          data: UpdateProjectSchema, project_id: int):
     return await ProjectService.update_project(session, user, project_id, data)
+
+
+@router.delete('/delete/{project_id}/', status_code=status.HTTP_204_NO_CONTENT)
+async def delete_project(user: Annotated[UserRead, Depends(current_user)],
+                         session: Annotated[AsyncSession, Depends(db_settings.get_session)],
+                         project_id: int):
+    return await ProjectService.delete_project(session, user, project_id)
 
 
 @router.get('/list/', response_model=List[ReadProjectSchema])

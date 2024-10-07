@@ -7,6 +7,7 @@ from app.database import Base
 
 if TYPE_CHECKING:
     from app.users import User
+    from app.dashboards import Dashboard
 
 
 class Project(Base):
@@ -17,6 +18,7 @@ class Project(Base):
 
     invited_users: Mapped[List['User']] = relationship(secondary='project_users', back_populates='invited_projects')
     invitations: Mapped['ProjectUsers'] = relationship(back_populates='project')
+    dashboards: Mapped[List['Dashboard']] = relationship(back_populates='project')
 
     __table_args__ = (UniqueConstraint('title', 'user_id'),)
 
