@@ -4,7 +4,6 @@ from pydantic import BaseModel
 class DashboardBaseSchema(BaseModel):
     title: str
     color: str
-    index: int
 
 
 class DashboardCreateSchema(DashboardBaseSchema):
@@ -17,4 +16,9 @@ class DashboardUpdateSchema(DashboardBaseSchema):
 
 class DashboardReadSchema(DashboardBaseSchema):
     id: int
+    index: int
     project_id: int
+
+
+class DashboardMovingSchema(BaseModel):
+    index: int

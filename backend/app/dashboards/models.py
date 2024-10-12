@@ -16,7 +16,5 @@ class Dashboard(Base):
 
     project: Mapped['Project'] = relationship(back_populates='dashboards')
 
-    __table_args__ = (UniqueConstraint('project_id', 'index'),)
-
     def __str__(self):
         return f'<Dashboard {self.id}: {self.title}>'

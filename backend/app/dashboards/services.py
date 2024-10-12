@@ -1,5 +1,6 @@
 from typing import List
 
+from sqlalchemy import select, Result, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.dashboards import Dashboard
@@ -26,9 +27,16 @@ class DashboardService(DatabaseService):
                                project_id: int,
                                data: DashboardCreateSchema) -> DashboardReadSchema:
         await cls.check_project(session, user, project_id)
+        total_dashboards = await session.execute(
+            select(func.count()).where(cls.model.project_id == project_id)
+        )
+        total_count = total_dashboards.scalar()
         values = data.model_dump()
         values['project_id'] = project_id
-        return await cls.create(session, values)
+        values['index'] = total_count
+        dashboard = await cls.create(session, values)
+
+        return await cls.moving_dashboard(session, user, project_id, dashboard.id, 0)
 
     @classmethod
     async def update_dashboard(cls,
@@ -65,3 +73,62 @@ class DashboardService(DatabaseService):
         await cls.check_project(session, user, project_id)
         filters = {'id': dashboard_id, 'project_id': project_id}
         return await cls.get_detail(session, filters)
+
+    @classmethod
+    async def moving_dashboard(cls, session: AsyncSession,
+                               user: UserRead,
+                               project_id: int,
+                               dashboard_id: int,
+                               index: int):
+        await cls.check_project(session, user, project_id)
+
+        current_dashboard = await cls.get_dashboard(session, user, project_id, dashboard_id)
+
+        if current_dashboard.index == index:
+            return await cls.get_dashboard(session, user, project_id, dashboard_id)
+
+        total_dashboards = await session.execute(
+            select(func.count()).where(cls.model.project_id == project_id)
+        )
+        total_count = total_dashboards.scalar()
+
+        # Ограничиваем новый индекс
+        if index < 0:
+            index = 0
+        elif index >= total_count:
+            index = total_count - 1
+
+        if index < current_dashboard.index:
+            query = (
+                select(cls.model)
+                .where(
+                    cls.model.project_id == project_id,
+                    cls.model.index >= index,
+                    cls.model.index < current_dashboard.index,
+                    cls.model.id != current_dashboard.id
+                )
+            )
+        else:
+            query = (
+                select(cls.model)
+                .where(
+                    cls.model.project_id == project_id,
+                    cls.model.index > current_dashboard.index,
+                    cls.model.index <= index,
+                    cls.model.id != current_dashboard.id
+                )
+            )
+
+        result: Result[tuple[cls.model]] = await session.execute(query)
+        dashboards = result.scalars().all()
+
+        for dashboard in dashboards:
+            dashboard.index += 1 if index < current_dashboard.index else -1
+
+        current_dashboard.index = index
+
+        await session.commit()
+
+        return await cls.get_dashboard(session, user, project_id, dashboard_id)
+
+

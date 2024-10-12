@@ -3,7 +3,8 @@ from typing import Annotated, List
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.dashboards.schemas import DashboardCreateSchema, DashboardUpdateSchema, DashboardReadSchema
+from app.dashboards.schemas import DashboardCreateSchema, DashboardUpdateSchema, DashboardReadSchema, \
+    DashboardMovingSchema
 from app.dashboards.services import DashboardService
 from app.database import db_settings
 from app.users.dependencies import current_user
@@ -30,6 +31,15 @@ async def update_dashboard(session: Annotated[AsyncSession, Depends(db_settings.
                            dashboard_id: int,
                            data: DashboardUpdateSchema):
     return await DashboardService.update_dashboard(session, user, project_id, dashboard_id, data)
+
+
+@router.put('/{project_id}/moving/{dashboard_id}')
+async def moving_dashboard(session: Annotated[AsyncSession, Depends(db_settings.get_session)],
+                           user: Annotated[UserRead, Depends(current_user)],
+                           project_id: int,
+                           dashboard_id: int,
+                           data: DashboardMovingSchema):
+    return await DashboardService.moving_dashboard(session, user, project_id, dashboard_id, data.index)
 
 
 @router.delete('/{project_id}/delete/{dashboard_id}/', status_code=status.HTTP_204_NO_CONTENT)
