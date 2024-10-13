@@ -10,4 +10,8 @@ class TaskBaseSchema(BaseModel):
 
 
 class TaskCreateSchema(TaskBaseSchema):
+    dashboard_id: int
+
+
+class TaskUpdateSchema(TaskBaseSchema):
     pass

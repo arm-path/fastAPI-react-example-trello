@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, List
 from sqlalchemy import String, Integer, ForeignKey, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -6,6 +6,7 @@ from app.database import Base
 
 if TYPE_CHECKING:
     from app.projects import Project
+    from app.tasks import Task
 
 class Dashboard(Base):
     __tablename__ = 'dashboard'
@@ -15,6 +16,7 @@ class Dashboard(Base):
     index: Mapped[int] = mapped_column(Integer, default=0)
 
     project: Mapped['Project'] = relationship(back_populates='dashboards')
+    tasks: Mapped[List['Task']] = relationship(back_populates='dashboard')
 
     def __str__(self):
         return f'<Dashboard {self.id}: {self.title}>'
