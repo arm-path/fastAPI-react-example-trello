@@ -21,16 +21,14 @@ class Task(Base):
     updated: Mapped[datetime] = mapped_column(server_default=text("TIMEZONE('utc', now())"), onupdate=datetime.utcnow)
     deadline: Mapped[datetime] = mapped_column(default=default_deadline_three_days)
 
-    responsible: Mapped[List['ResponsibleTask']] = relationship(secondary='responsible_task', back_populates='task')
+    responsible_users: Mapped[List['User']] = relationship(secondary='responsible_task',
+                                                           back_populates='responsible_tasks')
 
 
 class ResponsibleTask(Base):
     __tablename__ = 'responsible_task'
     task_id: Mapped[int] = mapped_column(ForeignKey('task.id', ondelete='CASCADE'), nullable=False)
     responsible_id: Mapped[int] = mapped_column(ForeignKey('user.id', ondelete='CASCADE'), nullable=False)
-
-    task: Mapped['Task'] = relationship(back_populates='responsible')
-    responsible: Mapped['User'] = relationship(back_populates='responsible_tasks')
 
     def __str__(self):
         return f'<ResponsibleTask {self.id}: {self.task_id} - {self.responsible_id}>'

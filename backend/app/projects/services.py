@@ -1,7 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import DatabaseService
-from app.projects import Project
+from app.projects import Project, ProjectUsers
 from app.projects.schemas import CreateProjectSchema, UpdateProjectSchema
 from app.users.schemas import UserRead
 
@@ -35,3 +35,7 @@ class ProjectService(DatabaseService):
     async def get_project(cls, session: AsyncSession, user: UserRead, project_id: int):
         filters = {'user_id': user.id, 'id': project_id}
         return await cls.get_detail(session, filters)
+
+
+class ProjectUsersService(DatabaseService):
+    model = ProjectUsers

@@ -11,7 +11,7 @@ from app.database.settings import Base, db_settings
 if TYPE_CHECKING:
     from app.projects import Project
     from app.projects import ProjectUsers
-    from app.tasks import ResponsibleTask
+    from app.tasks import Task
 
 
 class User(SQLAlchemyBaseUserTable[int], Base):
@@ -20,8 +20,8 @@ class User(SQLAlchemyBaseUserTable[int], Base):
 
     invited_projects: Mapped[List['Project']] = relationship(secondary='project_users', back_populates='invited_users')
     invitations: Mapped[List['ProjectUsers']] = relationship(back_populates='invited_user')
-    responsible_tasks: Mapped[List['ResponsibleTask']] = relationship(secondary='responsible_task',
-                                                                      back_populates='responsible')
+    responsible_tasks: Mapped[List['Task']] = relationship(secondary='responsible_task',
+                                                                      back_populates='responsible_users')
 
 
 async def get_user_db(session: AsyncSession = Depends(db_settings.get_session)):

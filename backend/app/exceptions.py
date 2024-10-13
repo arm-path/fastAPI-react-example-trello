@@ -41,3 +41,9 @@ ProjectNotFoundException = HTTPException(
     status_code=status.HTTP_404_NOT_FOUND,
     detail={'msg': 'Project not found'}
 )
+
+# Task
+CreateForbiddenTaskException = HTTPException(
+    status_code=status.HTTP_403_FORBIDDEN,
+    detail={'msg', 'Create task forbidden'}
+)
