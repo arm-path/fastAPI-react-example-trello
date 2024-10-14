@@ -14,6 +14,8 @@ from app.projects import Project
 from app.projects import ProjectUsers
 from app.dashboards import Dashboard
 from app.tasks import Task, ResponsibleTask
+from app.files import File
+from app.stories import Story
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

@@ -10,6 +10,7 @@ from app.tasks.utils import default_deadline_three_days
 if TYPE_CHECKING:
     from app.users import User
     from app.dashboards import Dashboard
+    from app.files import File
 
 
 class Task(Base):
@@ -26,6 +27,7 @@ class Task(Base):
                                                            back_populates='responsible_tasks')
 
     dashboard: Mapped['Dashboard'] = relationship(back_populates='tasks')
+    files: Mapped[List['File']] = relationship(back_populates='task')
 
 
 class ResponsibleTask(Base):
