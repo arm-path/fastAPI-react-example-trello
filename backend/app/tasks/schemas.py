@@ -5,13 +5,14 @@ from pydantic import BaseModel
 
 class TaskBaseSchema(BaseModel):
     title: str
-    description: str | None = None
     deadline: datetime | None = None
 
 
 class TaskCreateSchema(TaskBaseSchema):
     dashboard_id: int
+    description: str | None = None
 
 
 class TaskUpdateSchema(TaskBaseSchema):
-    pass
+    dashboard_id: int
+    description: str | None = None

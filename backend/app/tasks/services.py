@@ -1,13 +1,12 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
-from sqlalchemy.testing.plugin.plugin_base import options
+from watchfiles import awatch
 
 from app.dashboards import Dashboard
 from app.dashboards.services import DashboardService
 from app.database import DatabaseService
 from app.exceptions import CreateForbiddenTaskException, DataConflictException
 from app.projects import Project
-from app.projects.services import ProjectService
 from app.tasks import Task
 from app.tasks.schemas import TaskCreateSchema, TaskUpdateSchema
 from app.users.schemas import UserRead
@@ -41,7 +40,7 @@ class TaskService(DatabaseService):
                           user: UserRead,
                           task_id: int,
                           data: TaskUpdateSchema):
-        dashboard  = await cls.check_rights(session, user, data.dashboard_id)
+        dashboard = await cls.check_rights(session, user, data.dashboard_id)
         filters = {'id': task_id}
         options = [selectinload(cls.model.dashboard)]
         task = await cls.get_detail(session, filters, options)
@@ -49,3 +48,24 @@ class TaskService(DatabaseService):
             raise DataConflictException
         values = data.model_dump()
         return await cls.update(session, filters, values)
+
+    @classmethod
+    async def delete_task(cls, session: AsyncSession, user: UserRead, task_id: int):
+        filters = {'id': task_id}
+        options = [
+            selectinload(cls.model.dashboard).selectinload(Dashboard.project)
+        ]
+        task = await cls.get_detail(session, filters, options)
+        if task and (task.creator_id == user.id or task.dashboard.project.user_id == user.id):
+            await cls.delete(session, filters)
+
+    @classmethod
+    async def get_tasks(cls, session: AsyncSession, user: UserRead, dashboard_id: int):
+        await cls.check_rights(session, user, dashboard_id)
+        return await cls.get_list(session, {'dashboard_id': dashboard_id})
+
+    @classmethod
+    async def get_task(cls, session: AsyncSession, user: UserRead, dashboard_id: int, task_id: int):
+        await cls.check_rights(session, user, dashboard_id)
+        filters = {'id': task_id, 'dashboard_id': dashboard_id}
+        return await cls.get_detail(session, filters)
