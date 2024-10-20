@@ -8,7 +8,7 @@ from app.dashboards.schemas import DashboardCreateSchema, DashboardReadSchema, D
 from app.database import DatabaseService
 from app.exceptions import ProjectNotFoundException
 from app.projects.services import ProjectService
-from app.users.schemas import UserRead
+from app.authentication.schemas import UserRead
 
 
 class DashboardService(DatabaseService):

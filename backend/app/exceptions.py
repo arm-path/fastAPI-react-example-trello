@@ -6,6 +6,11 @@ DataConflictException = HTTPException(
     detail={'msg': 'Data conflict'}
 )
 
+ObjectNotFoundException = lambda obj: HTTPException(
+    status_code=status.HTTP_404_NOT_FOUND,
+    detail={'msg': f'{obj} not found'}
+)
+
 # Database exceptions.
 UniqueViolationException = HTTPException(
     status_code=status.HTTP_409_CONFLICT,
@@ -53,3 +58,4 @@ CreateForbiddenTaskException = HTTPException(
     status_code=status.HTTP_403_FORBIDDEN,
     detail={'msg', 'Create task forbidden'}
 )
+

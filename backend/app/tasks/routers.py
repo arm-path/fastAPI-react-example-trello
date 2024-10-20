@@ -6,8 +6,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.database import db_settings
 from app.tasks.schemas import TaskCreateSchema, TaskUpdateSchema
 from app.tasks.services import TaskService
-from app.users.dependencies import current_user
-from app.users.schemas import UserRead
+from app.authentication.dependencies import current_user
+from app.authentication.schemas import UserRead
 
 router = APIRouter(
     prefix='/task',

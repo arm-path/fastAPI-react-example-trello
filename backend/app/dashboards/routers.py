@@ -7,8 +7,8 @@ from app.dashboards.schemas import DashboardCreateSchema, DashboardUpdateSchema,
     DashboardMovingSchema
 from app.dashboards.services import DashboardService
 from app.database import db_settings
-from app.users.dependencies import current_user
-from app.users.schemas import UserRead
+from app.authentication.dependencies import current_user
+from app.authentication.schemas import UserRead
 
 router = APIRouter(
     prefix='/dashboard',

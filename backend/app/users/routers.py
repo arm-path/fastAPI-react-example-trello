@@ -1,22 +1,47 @@
-from fastapi import APIRouter
+from typing import Annotated, List
 
-from app.users.configuration import auth_backend
-from app.users.dependencies import fastapi_users
-from app.users.schemas import UserRead, UserCreate
+from fastapi import APIRouter, Depends
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.authentication.dependencies import current_user
+from app.authentication.schemas import UserRead
+from app.database import db_settings
+from app.projects.schemas import ProjectOwnerSchema
+from app.users.schemas import UserDetailSchema, JoiningProjectSchema
+from app.users.services import UserService
 
 router = APIRouter(
-    prefix='/auth',
-    tags=['Authentication']
+    prefix='/user',
+    tags=['User']
 )
 
-router.include_router(
-    fastapi_users.get_auth_router(auth_backend)
-)
 
-router.include_router(
-    fastapi_users.get_register_router(UserRead, UserCreate)
-)
+@router.get('/detail/', response_model=UserDetailSchema)
+async def get_user(user: Annotated[UserRead, Depends(current_user)]):
+    return user
 
-router.include_router(
-    fastapi_users.get_verify_router(UserRead),
-)
+
+@router.get('/invitations-projects/', response_model=List[ProjectOwnerSchema])
+async def get_invitations_projects(user: Annotated[UserRead, Depends(current_user)],
+                                   session: Annotated[AsyncSession, Depends(db_settings.get_session)]):
+    return await UserService.get_invitations_projects(session, user)
+
+
+@router.get('/invited-projects/', response_model=List[ProjectOwnerSchema])
+async def get_invited_projects(user: Annotated[UserRead, Depends(current_user)],
+                               session: Annotated[AsyncSession, Depends(db_settings.get_session)]):
+    return await UserService.get_invited_projects(session, user)
+
+
+@router.post('/invitation-project/accept/')
+async def invitation_project_accept(user: Annotated[UserRead, Depends(current_user)],
+                                    session: Annotated[AsyncSession, Depends(db_settings.get_session)],
+                                    data: JoiningProjectSchema):
+    return await UserService.invitation_project_accept(session, user, data.project_id)
+
+
+@router.delete('/invited-project/delete/')
+async def invited_project_delete(user: Annotated[UserRead, Depends(current_user)],
+                                 session: Annotated[AsyncSession, Depends(db_settings.get_session)],
+                                 data: JoiningProjectSchema):
+    return await UserService.invited_project_delete(session, user, data.project_id)

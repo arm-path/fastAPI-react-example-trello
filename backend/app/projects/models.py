@@ -15,10 +15,10 @@ class Project(Base):
     __tablename__ = 'project'
     title: Mapped[str] = mapped_column(String(69), nullable=False)
     user_id: Mapped[int] = mapped_column(ForeignKey('user.id', ondelete='CASCADE'), nullable=False)
-    description: Mapped[str] = mapped_column(String(255), nullable=True)
 
+    user: Mapped['User'] = relationship(back_populates='projects')
     invited_users: Mapped[List['User']] = relationship(secondary='project_users', back_populates='invited_projects')
-    invitations: Mapped['ProjectUsers'] = relationship(back_populates='project')
+    invitations: Mapped[List['ProjectUsers']] = relationship(back_populates='project')
     dashboards: Mapped[List['Dashboard']] = relationship(back_populates='project')
     stories: Mapped[List['Story']] = relationship(back_populates='project')
 

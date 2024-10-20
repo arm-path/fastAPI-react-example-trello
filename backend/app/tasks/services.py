@@ -1,6 +1,5 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
-from watchfiles import awatch
 
 from app.dashboards import Dashboard
 from app.dashboards.services import DashboardService
@@ -9,7 +8,7 @@ from app.exceptions import CreateForbiddenTaskException, DataConflictException
 from app.projects import Project
 from app.tasks import Task
 from app.tasks.schemas import TaskCreateSchema, TaskUpdateSchema
-from app.users.schemas import UserRead
+from app.authentication.schemas import UserRead
 
 
 class TaskService(DatabaseService):

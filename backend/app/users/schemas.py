@@ -1,32 +1,19 @@
-from fastapi_users.schemas import model_dump
-from pydantic import BaseModel, EmailStr
-from fastapi_users import schemas
+from pydantic import BaseModel
 
 
-class UserRead(schemas.BaseUser[int]):
-    pass
+class UserBaseSchema(BaseModel):
+    id: int
+    email: str
 
 
-class UserCreate(BaseModel):
-    email: EmailStr
-    password: str
-
-    def create_update_dict(self):
-        return model_dump(
-            self,
-            exclude_unset=True,
-            exclude={
-                "id",
-                "is_superuser",
-                "is_active",
-                "is_verified",
-                "oauth_accounts",
-            },
-        )
-
-    def create_update_dict_superuser(self):
-        return model_dump(self, exclude_unset=True, exclude={"id"})
+class UserInformationSchema(UserBaseSchema):
+    first_name: str | None
+    last_name: str | None
 
 
-class UserUpdate(schemas.BaseUserUpdate):
-    pass
+class UserDetailSchema(UserInformationSchema):
+    is_active: bool
+    is_verified: bool
+
+class JoiningProjectSchema(BaseModel):
+    project_id: int
