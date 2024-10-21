@@ -14,5 +14,4 @@ class TaskCreateSchema(TaskBaseSchema):
 
 
 class TaskUpdateSchema(TaskBaseSchema):
-    dashboard_id: int
     description: str | None = None

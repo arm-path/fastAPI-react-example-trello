@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import List, TYPE_CHECKING
 
-from sqlalchemy import String, ForeignKey, DateTime, text
+from sqlalchemy import String, ForeignKey, text, Integer
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
@@ -22,6 +22,7 @@ class Task(Base):
     created: Mapped[datetime] = mapped_column(server_default=text("TIMEZONE('utc', now())"))
     updated: Mapped[datetime] = mapped_column(server_default=text("TIMEZONE('utc', now())"), onupdate=datetime.utcnow)
     deadline: Mapped[datetime] = mapped_column(default=default_deadline_three_days)
+    index: Mapped[int] = mapped_column(Integer, default=0)
 
     responsible_users: Mapped[List['User']] = relationship(secondary='responsible_task',
                                                            back_populates='responsible_tasks')

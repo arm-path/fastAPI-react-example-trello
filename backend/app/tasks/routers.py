@@ -30,6 +30,14 @@ async def update_task(session: Annotated[AsyncSession, Depends(db_settings.get_s
     return await TaskService.update_task(session, user, task_id, data)
 
 
+@router.put('/{task_id}/moving-between-dashboard/{dashboard_id}')
+async def moving_between_dashboard(session: Annotated[AsyncSession, Depends(db_settings.get_session)],
+                                   user: Annotated[UserRead, Depends(current_user)],
+                                   dashboard_id: int,
+                                   task_id: int):
+    return await TaskService.moving_between_dashboard(session, user, dashboard_id, task_id)
+
+
 @router.delete('/delete/{task_id}')
 async def delete_task(session: Annotated[AsyncSession, Depends(db_settings.get_session)],
                       user: Annotated[UserRead, Depends(current_user)],
