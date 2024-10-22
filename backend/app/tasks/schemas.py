@@ -15,3 +15,7 @@ class TaskCreateSchema(TaskBaseSchema):
 
 class TaskUpdateSchema(TaskBaseSchema):
     description: str | None = None
+
+
+class TaskMovingSchema(BaseModel):
+    index: int

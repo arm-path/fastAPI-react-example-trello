@@ -1,3 +1,4 @@
+from sqlalchemy import select, func, Result
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -50,7 +51,9 @@ class TaskService(DatabaseService):
     async def create_task(cls, session: AsyncSession, user: UserRead, data: TaskCreateSchema):
         dashboard = await cls.check_rights(session, user, data.dashboard_id)
         values = data.model_dump()
+        total_task = await session.execute(select(func.count()).where(cls.model.dashboard_id == data.dashboard_id))
         values['creator_id'] = user.id
+        values['index'] = total_task.scalar()
         task = await cls.create(session, values)
         await StoriesService.story_create_task(session, user, dashboard.project_id, task)
         return task
@@ -105,3 +108,60 @@ class TaskService(DatabaseService):
                                                                 old_dashboard_id,
                                                                 task.dashboard_id)
         return task
+
+    @classmethod
+    async def moving_task(cls, session: AsyncSession, user: UserRead, task_id: int, index: int):
+        options = [selectinload(cls.model.dashboard)]
+        task = await cls.get_detail(session, {'id': task_id}, options)
+        await cls.check_rights(session, user, task.dashboard_id)
+        return await cls.change_index_task(session, user, task, index)
+
+    @classmethod
+    async def change_index_task(cls, session: AsyncSession,
+                                user: UserRead,
+                                task: Task,
+                                index: int):
+
+        if task.index == index:
+            return task
+
+        total_task = await session.execute(select(func.count()).where(cls.model.dashboard_id == task.dashboard_id))
+        total_count = total_task.scalar()
+
+        if index < 0:
+            index = 0
+        elif index >= total_count:
+            index = total_count - 1
+
+        if index < task.index:
+            query = (
+                select(cls.model)
+                .where(
+                    cls.model.dashboard_id == task.dashboard_id,
+                    cls.model.index >= index,
+                    cls.model.index < task.index,
+                    cls.model.id != task.id
+                )
+            )
+        else:
+            query = (
+                select(cls.model)
+                .where(
+                    cls.model.dashboard_id == task.dashboard_id,
+                    cls.model.index > task.index,
+                    cls.model.index <= index,
+                    cls.model.id != task.id
+                )
+            )
+
+        result: Result[tuple[cls.model]] = await session.execute(query)
+        tasks = result.scalars().all()
+
+        for el in tasks:
+            el.index += 1 if index < task.index else -1
+
+        task.index = index
+
+        await session.commit()
+
+        return await cls.get_task(session, user, task.dashboard_id, task.id)

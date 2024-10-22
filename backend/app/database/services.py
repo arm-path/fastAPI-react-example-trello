@@ -67,8 +67,8 @@ class DatabaseService:
                 raise IntegrityException
         except InvalidRequestError as e:
             raise InvalidRequestException
-        except Exception as e:
-            raise DatabaseException
+        # except Exception as e:
+        #     raise DatabaseException
         return model
 
     @classmethod

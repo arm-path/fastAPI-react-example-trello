@@ -3,11 +3,11 @@ from typing import Annotated
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.database import db_settings
-from app.tasks.schemas import TaskCreateSchema, TaskUpdateSchema
-from app.tasks.services import TaskService
 from app.authentication.dependencies import current_user
 from app.authentication.schemas import UserRead
+from app.database import db_settings
+from app.tasks.schemas import TaskCreateSchema, TaskUpdateSchema, TaskMovingSchema
+from app.tasks.services import TaskService
 
 router = APIRouter(
     prefix='/task',
@@ -58,3 +58,11 @@ async def get_task(session: Annotated[AsyncSession, Depends(db_settings.get_sess
                    dashboard_id: int,
                    task_id: int):
     return await TaskService.get_task(session, user, dashboard_id, task_id)
+
+
+@router.post('/moving/{task_id}/')
+async def moving_task(session: Annotated[AsyncSession, Depends(db_settings.get_session)],
+                      user: Annotated[UserRead, Depends(current_user)],
+                      task_id: int,
+                      data: TaskMovingSchema):
+    return await TaskService.moving_task(session, user, task_id, data.index)
