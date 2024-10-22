@@ -1,6 +1,7 @@
 from sqlalchemy import select, func, Result
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
+from sqlalchemy.testing.plugin.plugin_base import options
 
 from app.authentication.schemas import UserRead
 from app.dashboards import Dashboard
@@ -17,44 +18,13 @@ class TaskService(DatabaseService):
     model = Task
 
     @classmethod
-    async def check_rights(cls, session: AsyncSession,
-                           user: UserRead,
-                           dashboard_id: int):
-        options = [selectinload(Dashboard.project).selectinload(Project.invited_users), ]
-        dashboard = await DashboardService.get_detail(session, {'id': dashboard_id}, options)
-        if not dashboard:
-            raise ObjectNotFoundException('Dashboard')
-        user_exists = any(dashboard.id == user.id for dashboard in dashboard.project.invited_users)
-
-        if dashboard.project.user_id != user.id and not user_exists:
-            raise CreateForbiddenTaskException
-        return dashboard
-
-    @classmethod
-    async def edit_task(cls,
-                        session: AsyncSession,
-                        user: UserRead,
-                        task_id: int,
-                        dashboard_id: int,
-                        values: dict):
-        dashboard = await cls.check_rights(session, user, dashboard_id)
-        filters = {'id': task_id}
-        options = [selectinload(cls.model.dashboard)]
-        task = await cls.get_detail(session, filters, options)
-        if dashboard.project_id != task.dashboard.project_id:
-            raise DataConflictException
-        task = await cls.update(session, filters, values)
-        await StoriesService.story_update_task(session, user, dashboard.project_id, task)
-        return task
-
-    @classmethod
     async def create_task(cls, session: AsyncSession, user: UserRead, data: TaskCreateSchema):
-        dashboard = await cls.check_rights(session, user, data.dashboard_id)
+        dashboard = await cls.get_dashboard_project(session, data.dashboard_id)
+        cls.access_check(user, dashboard)
         values = data.model_dump()
-        total_task = await session.execute(select(func.count()).where(cls.model.dashboard_id == data.dashboard_id))
         values['creator_id'] = user.id
-        values['index'] = total_task.scalar()
-        task = await cls.create(session, values)
+        values['index'] = await cls.total_task_in_dashboard(session, dashboard.id)
+        task = await cls.create(session, values, [selectinload(cls.model.creator)])
         await StoriesService.story_create_task(session, user, dashboard.project_id, task)
         return task
 
@@ -63,36 +33,39 @@ class TaskService(DatabaseService):
                           user: UserRead,
                           task_id: int,
                           data: TaskUpdateSchema):
-        options = [selectinload(cls.model.dashboard)]
-        task = await cls.get_detail(session, {'id': task_id}, options)
-        dashboard = await cls.check_rights(session, user, task.dashboard.id)
+        task = await cls.get_task_dashboard_project(session, task_id)
+        dashboard = cls.access_check(user, task.dashboard)
         task = await cls.update(session, {'id': task_id}, data.model_dump())
         await StoriesService.story_update_task(session, user, dashboard.project_id, task)
         return task
 
     @classmethod
     async def delete_task(cls, session: AsyncSession, user: UserRead, task_id: int):
-        filters = {'id': task_id}
-        options = [
-            selectinload(cls.model.dashboard).selectinload(Dashboard.project)
-        ]
-        task = await cls.get_detail(session, filters, options)
+        options = [selectinload(cls.model.dashboard).selectinload(Dashboard.project)]
+        task = await cls.get_detail(session, {'id': task_id}, options)
         if task and (task.creator_id == user.id or task.dashboard.project.user_id == user.id):
-            await cls.delete(session, filters)
+            total_index = await cls.total_task_in_dashboard(session, task.dashboard.id)
+            await cls.change_index_task(session, user, task, total_index)
+            description = StoriesService.story_task_description(task)
+            project_id = task.dashboard.project_id
+            await cls.delete(session, {'id': task_id})
+            await StoriesService.story_delete_task(session, user, project_id, description)
 
     @classmethod
     async def get_tasks(cls, session: AsyncSession, user: UserRead, dashboard_id: int):
-        await cls.check_rights(session, user, dashboard_id)
-        return await cls.get_list(session, {'dashboard_id': dashboard_id})
+        dashboard = await cls.get_dashboard_project(session, dashboard_id)
+        cls.access_check(user, dashboard)
+        return await cls.get_list(session, {'dashboard_id': dashboard_id}, [selectinload(cls.model.creator)])
 
     @classmethod
-    async def get_task(cls, session: AsyncSession, user: UserRead, dashboard_id: int, task_id: int):
-        await cls.check_rights(session, user, dashboard_id)
-        filters = {'id': task_id, 'dashboard_id': dashboard_id}
-        return await cls.get_detail(session, filters)
+    async def get_task(cls, session: AsyncSession, user: UserRead, task_id: int):
+        task = await cls.get_task_dashboard_project(session, task_id)
+        cls.access_check(user, task.dashboard)
+        return task
 
     @classmethod
     async def moving_between_dashboard(cls, session: AsyncSession, user: UserRead, dashboard_id: int, task_id: int):
+
         dashboard = await cls.check_rights(session, user, dashboard_id)
         filters = {'id': task_id}
         options = [selectinload(cls.model.dashboard)]
@@ -111,9 +84,8 @@ class TaskService(DatabaseService):
 
     @classmethod
     async def moving_task(cls, session: AsyncSession, user: UserRead, task_id: int, index: int):
-        options = [selectinload(cls.model.dashboard)]
-        task = await cls.get_detail(session, {'id': task_id}, options)
-        await cls.check_rights(session, user, task.dashboard_id)
+        task = await cls.get_task_dashboard_project(session, task_id)
+        cls.access_check(user, task.dashboard)
         return await cls.change_index_task(session, user, task, index)
 
     @classmethod
@@ -124,9 +96,7 @@ class TaskService(DatabaseService):
 
         if task.index == index:
             return task
-
-        total_task = await session.execute(select(func.count()).where(cls.model.dashboard_id == task.dashboard_id))
-        total_count = total_task.scalar()
+        total_count = await cls.total_task_in_dashboard(session, task.dashboard_id)
 
         if index < 0:
             index = 0
@@ -164,4 +134,46 @@ class TaskService(DatabaseService):
 
         await session.commit()
 
-        return await cls.get_task(session, user, task.dashboard_id, task.id)
+        return task
+
+    @classmethod
+    def access_check(cls, user: UserRead, dashboard: Dashboard):
+        if not dashboard:
+            raise ObjectNotFoundException('Dashboard')
+        user_exists = any(dashboard.id == user.id for dashboard in dashboard.project.invited_users)
+
+        if dashboard.project.user_id != user.id and not user_exists:
+            raise CreateForbiddenTaskException
+        return dashboard
+
+    @classmethod
+    async def get_dashboard_project(cls, session: AsyncSession, dashboard_id: int):
+        options = [
+            selectinload(Dashboard.project).selectinload(Project.invited_users)
+        ]
+        dashboard = await DashboardService.get_detail(session, {'id': dashboard_id}, options)
+        return dashboard
+
+    @classmethod
+    async def get_task_dashboard_project(cls, session: AsyncSession, task_id: int):
+        options = [
+            selectinload(Task.dashboard).options(selectinload(Dashboard.project).selectinload(Project.invited_users)),
+            selectinload(Task.creator)
+        ]
+        task = await cls.get_detail(session, {'id': task_id}, options)
+        if not task:
+            raise ObjectNotFoundException('Task')
+        return task
+
+    @classmethod
+    async def total_task_in_dashboard(cls, session, dashboard_id):
+        total_task = await session.execute(select(func.count()).where(cls.model.dashboard_id == dashboard_id))
+        return total_task.scalar()
+
+    @classmethod
+    async def check_rights(cls, session: AsyncSession,
+                           user: UserRead,
+                           dashboard_id: int):
+        options = [selectinload(Dashboard.project).selectinload(Project.invited_users), ]
+        dashboard = await DashboardService.get_detail(session, {'id': dashboard_id}, options)
+        return cls.access_check(user, dashboard)

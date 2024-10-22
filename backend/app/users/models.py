@@ -31,7 +31,7 @@ class User(Base):
     invitations: Mapped[List['ProjectUsers']] = relationship(back_populates='invited_user')
     responsible_tasks: Mapped[List['Task']] = relationship(secondary='responsible_task',
                                                            back_populates='responsible_users')
-
+    tasks: Mapped[List['Task']] = relationship(back_populates='creator')
     stories: Mapped[List['Story']] = relationship(back_populates='user')
     upload_files: Mapped[List['File']] = relationship(back_populates='user')
 

@@ -26,7 +26,7 @@ class Task(Base):
 
     responsible_users: Mapped[List['User']] = relationship(secondary='responsible_task',
                                                            back_populates='responsible_tasks')
-
+    creator: Mapped['User'] = relationship(back_populates='tasks')
     dashboard: Mapped['Dashboard'] = relationship(back_populates='tasks')
     files: Mapped[List['File']] = relationship(back_populates='task')
 

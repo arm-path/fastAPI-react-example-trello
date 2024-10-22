@@ -2,6 +2,8 @@ from datetime import datetime
 
 from pydantic import BaseModel
 
+from app.users.schemas import UserInformationSchema
+
 
 class TaskBaseSchema(BaseModel):
     title: str
@@ -15,6 +17,14 @@ class TaskCreateSchema(TaskBaseSchema):
 
 class TaskUpdateSchema(TaskBaseSchema):
     description: str | None = None
+
+
+class TaskDetailSchema(TaskCreateSchema):
+    created: datetime
+    updated: datetime
+    id: int
+    index: int
+    creator: UserInformationSchema
 
 
 class TaskMovingSchema(BaseModel):

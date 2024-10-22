@@ -9,14 +9,6 @@ class StoriesService(DatabaseService):
     model = Story
 
     @classmethod
-    def story_task_description(cls, task):
-        return (f'id: {task.id}, '
-                f'title: {task.title}, '
-                f'dashboard_id: {task.dashboard_id}, '
-                f'description: {task.description}, '
-                f'deadline: {task.deadline}')
-
-    @classmethod
     async def story_create_task(cls,
                                 session: AsyncSession,
                                 user: UserRead,
@@ -41,6 +33,18 @@ class StoriesService(DatabaseService):
         await cls.create(session, values)
 
     @classmethod
+    async def story_delete_task(cls,
+                                session: AsyncSession,
+                                user: UserRead,
+                                project_id: int,
+                                description: str):
+        values = {'action': 'Delete task',
+                  'user_id': user.id,
+                  'project_id': project_id,
+                  'description': description}
+        await cls.create(session, values)
+
+    @classmethod
     async def story_moving_between_dashboard(cls,
                                              session: AsyncSession,
                                              user: UserRead,
@@ -53,3 +57,11 @@ class StoriesService(DatabaseService):
                   'project_id': project_id,
                   'description': description}
         await cls.create(session, values)
+
+    @classmethod
+    def story_task_description(cls, task):
+        return (f'id: {task.id}, '
+                f'title: {task.title}, '
+                f'dashboard_id: {task.dashboard_id}, '
+                f'description: {task.description}, '
+                f'deadline: {task.deadline}')
