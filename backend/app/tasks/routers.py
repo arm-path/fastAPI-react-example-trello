@@ -38,9 +38,9 @@ async def update_task(session: Annotated[AsyncSession, Depends(db_settings.get_s
 
 @router.put('/moving-dashboard/{task_id}/', response_model=TaskDetailSchema)
 async def moving_task_dashboard(session: Annotated[AsyncSession, Depends(db_settings.get_session)],
-                                   user: Annotated[UserRead, Depends(current_user)],
-                                   task_id: int,
-                                   data: TaskMovingDashboard):
+                                user: Annotated[UserRead, Depends(current_user)],
+                                task_id: int,
+                                data: TaskMovingDashboard):
     return await TaskService.moving_task_dashboard(session, user, data, task_id)
 
 
@@ -72,9 +72,18 @@ async def get_task(session: Annotated[AsyncSession, Depends(db_settings.get_sess
                    task_id: int):
     return await TaskService.get_task(session, user, task_id)
 
-@router.post('/assign-users/{task_id}')
+
+@router.post('/assign-users/{task_id}', response_model=TaskExtendedDetailSchema)
 async def task_assign_responsible(session: Annotated[AsyncSession, Depends(db_settings.get_session)],
                                   user: Annotated[UserRead, Depends(current_user)],
                                   task_id: int,
                                   data: TaskAssignResponsibleSchema):
     return await TaskService.task_assign_responsible(session, user, task_id, data.user_ids)
+
+
+@router.delete('/delete-users/{task_id}', status_code=status.HTTP_204_NO_CONTENT)
+async def task_delete_responsible(session: Annotated[AsyncSession, Depends(db_settings.get_session)],
+                                  user: Annotated[UserRead, Depends(current_user)],
+                                  task_id: int,
+                                  data: TaskAssignResponsibleSchema):
+    return await TaskService.task_delete_responsible(session, user, task_id, data.user_ids)

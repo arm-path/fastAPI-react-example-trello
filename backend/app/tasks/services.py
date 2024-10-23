@@ -109,12 +109,30 @@ class TaskService(DatabaseService):
         if not all_users_exist:
             raise WrongUserIdsException
         responsible_tasks = [ResponsibleTask(task_id=task_id, responsible_id=user_id) for user_id in user_ids]
+        session.add_all(responsible_tasks)
+        await session.commit()
+
+    @classmethod
+    async def task_delete_responsible(cls, session: AsyncSession, user: UserRead, task_id: int, user_ids: List[int]):
+        task = await cls.get_task_dashboard_project(session, task_id)
+        cls.access_check(user, task.dashboard)
+        responsible_tasks = await session.execute(
+            select(ResponsibleTask).where(
+                ResponsibleTask.task_id == task_id,
+                ResponsibleTask.responsible_id.in_(user_ids)
+            )
+        )
+        responsible_tasks = responsible_tasks.scalars().all()
+
+        # Delete the responsible tasks
+        for task in responsible_tasks:
+            await session.delete(task)
+
         try:
-            session.add_all(responsible_tasks)
             await session.commit()
         except IntegrityError:
             raise IntegrityException
-        return responsible_tasks
+
 
     @classmethod
     async def change_index_task(cls, session: AsyncSession,
