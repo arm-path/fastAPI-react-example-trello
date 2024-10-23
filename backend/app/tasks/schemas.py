@@ -29,3 +29,7 @@ class TaskDetailSchema(TaskCreateSchema):
 
 class TaskMovingSchema(BaseModel):
     index: int
+
+
+class TaskMovingDashboard(TaskMovingSchema):
+    dashboard_id: int

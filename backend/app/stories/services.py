@@ -45,7 +45,7 @@ class StoriesService(DatabaseService):
         await cls.create(session, values)
 
     @classmethod
-    async def story_moving_between_dashboard(cls,
+    async def story_task_moving_dashboard(cls,
                                              session: AsyncSession,
                                              user: UserRead,
                                              project_id: int,

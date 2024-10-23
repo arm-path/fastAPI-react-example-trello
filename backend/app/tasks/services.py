@@ -1,7 +1,6 @@
 from sqlalchemy import select, func, Result
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
-from sqlalchemy.testing.plugin.plugin_base import options
 
 from app.authentication.schemas import UserRead
 from app.dashboards import Dashboard
@@ -11,7 +10,7 @@ from app.exceptions import CreateForbiddenTaskException, DataConflictException, 
 from app.projects import Project
 from app.stories.services import StoriesService
 from app.tasks import Task
-from app.tasks.schemas import TaskCreateSchema, TaskUpdateSchema
+from app.tasks.schemas import TaskCreateSchema, TaskUpdateSchema, TaskMovingDashboard
 
 
 class TaskService(DatabaseService):
@@ -45,7 +44,7 @@ class TaskService(DatabaseService):
         task = await cls.get_detail(session, {'id': task_id}, options)
         if task and (task.creator_id == user.id or task.dashboard.project.user_id == user.id):
             total_index = await cls.total_task_in_dashboard(session, task.dashboard.id)
-            await cls.change_index_task(session, user, task, total_index)
+            await cls.change_index_task(session, task, total_index)
             description = StoriesService.story_task_description(task)
             project_id = task.dashboard.project_id
             await cls.delete(session, {'id': task_id})
@@ -64,33 +63,39 @@ class TaskService(DatabaseService):
         return task
 
     @classmethod
-    async def moving_between_dashboard(cls, session: AsyncSession, user: UserRead, dashboard_id: int, task_id: int):
-
-        dashboard = await cls.check_rights(session, user, dashboard_id)
-        filters = {'id': task_id}
-        options = [selectinload(cls.model.dashboard)]
-        task = await cls.get_detail(session, filters, options)
+    async def moving_task_dashboard(cls, session: AsyncSession,
+                                    user: UserRead,
+                                    data: TaskMovingDashboard,
+                                    task_id: int):
+        dashboard = await cls.get_dashboard_project(session, data.dashboard_id)
+        cls.access_check(user, dashboard)
+        options = [selectinload(Task.creator), selectinload(cls.model.dashboard)]
+        task = await cls.get_detail(session, {'id': task_id}, options)
         old_dashboard_id = task.dashboard_id
         if dashboard.project_id != task.dashboard.project_id:
             raise DataConflictException
-        if task.dashboard.id != dashboard_id:
-            task = await cls.update(session, filters, {'dashboard_id': dashboard_id})
-            await StoriesService.story_moving_between_dashboard(session,
-                                                                user,
-                                                                dashboard.project_id,
-                                                                old_dashboard_id,
-                                                                task.dashboard_id)
+        if task.dashboard.id != data.dashboard_id:
+            previous_index_to_last = await cls.total_task_in_dashboard(session, task.dashboard_id)
+            await cls.change_index_task(session, task, previous_index_to_last)
+            next_index_to_last = await cls.total_task_in_dashboard(session, data.dashboard_id)
+            values = {'dashboard_id': data.dashboard_id, 'index': next_index_to_last}
+            task = await cls.update(session, {'id': task_id}, values, [selectinload(Task.creator)])
+            task = await cls.change_index_task(session, task, data.index)
+            await StoriesService.story_task_moving_dashboard(session,
+                                                             user,
+                                                             dashboard.project_id,
+                                                             old_dashboard_id,
+                                                             task.dashboard_id)
         return task
 
     @classmethod
     async def moving_task(cls, session: AsyncSession, user: UserRead, task_id: int, index: int):
         task = await cls.get_task_dashboard_project(session, task_id)
         cls.access_check(user, task.dashboard)
-        return await cls.change_index_task(session, user, task, index)
+        return await cls.change_index_task(session, task, index)
 
     @classmethod
     async def change_index_task(cls, session: AsyncSession,
-                                user: UserRead,
                                 task: Task,
                                 index: int):
 
@@ -152,6 +157,8 @@ class TaskService(DatabaseService):
             selectinload(Dashboard.project).selectinload(Project.invited_users)
         ]
         dashboard = await DashboardService.get_detail(session, {'id': dashboard_id}, options)
+        if not dashboard:
+            raise ObjectNotFoundException('Dashboard')
         return dashboard
 
     @classmethod
@@ -169,11 +176,3 @@ class TaskService(DatabaseService):
     async def total_task_in_dashboard(cls, session, dashboard_id):
         total_task = await session.execute(select(func.count()).where(cls.model.dashboard_id == dashboard_id))
         return total_task.scalar()
-
-    @classmethod
-    async def check_rights(cls, session: AsyncSession,
-                           user: UserRead,
-                           dashboard_id: int):
-        options = [selectinload(Dashboard.project).selectinload(Project.invited_users), ]
-        dashboard = await DashboardService.get_detail(session, {'id': dashboard_id}, options)
-        return cls.access_check(user, dashboard)
