@@ -1,6 +1,7 @@
 from datetime import datetime
+from typing import List
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from app.users.schemas import UserInformationSchema
 
@@ -26,6 +27,9 @@ class TaskDetailSchema(TaskCreateSchema):
     index: int
     creator: UserInformationSchema
 
+class TaskExtendedDetailSchema(TaskDetailSchema):
+    responsible_users: List[UserInformationSchema] = Field(..., serialization_alias='responsible')
+
 
 class TaskMovingSchema(BaseModel):
     index: int
@@ -33,3 +37,7 @@ class TaskMovingSchema(BaseModel):
 
 class TaskMovingDashboard(TaskMovingSchema):
     dashboard_id: int
+
+
+class TaskAssignResponsibleSchema(BaseModel):
+    user_ids: List[int]

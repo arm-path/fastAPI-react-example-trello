@@ -56,6 +56,10 @@ ProjectNotFoundException = HTTPException(
 # Task
 CreateForbiddenTaskException = HTTPException(
     status_code=status.HTTP_403_FORBIDDEN,
-    detail={'msg', 'Create task forbidden'}
+    detail={'msg': 'Create task forbidden'}
 )
 
+WrongUserIdsException = HTTPException(
+    status_code=status.HTTP_409_CONFLICT,
+    detail={'msg': 'Invalid user_ids passed'}
+)

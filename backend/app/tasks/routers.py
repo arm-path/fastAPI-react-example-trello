@@ -10,7 +10,9 @@ from app.tasks.schemas import (TaskCreateSchema,
                                TaskUpdateSchema,
                                TaskMovingSchema,
                                TaskDetailSchema,
-                               TaskMovingDashboard)
+                               TaskMovingDashboard,
+                               TaskAssignResponsibleSchema,
+                               TaskExtendedDetailSchema)
 from app.tasks.services import TaskService
 
 router = APIRouter(
@@ -64,8 +66,15 @@ async def get_tasks(session: Annotated[AsyncSession, Depends(db_settings.get_ses
     return await TaskService.get_tasks(session, user, dashboard_id)
 
 
-@router.get('/detail/{task_id}', response_model=TaskDetailSchema)
+@router.get('/detail/{task_id}', response_model=TaskExtendedDetailSchema)
 async def get_task(session: Annotated[AsyncSession, Depends(db_settings.get_session)],
                    user: Annotated[UserRead, Depends(current_user)],
                    task_id: int):
     return await TaskService.get_task(session, user, task_id)
+
+@router.post('/assign-users/{task_id}')
+async def task_assign_responsible(session: Annotated[AsyncSession, Depends(db_settings.get_session)],
+                                  user: Annotated[UserRead, Depends(current_user)],
+                                  task_id: int,
+                                  data: TaskAssignResponsibleSchema):
+    return await TaskService.task_assign_responsible(session, user, task_id, data.user_ids)

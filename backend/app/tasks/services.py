@@ -1,4 +1,7 @@
+from typing import List
+
 from sqlalchemy import select, func, Result
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -6,10 +9,11 @@ from app.authentication.schemas import UserRead
 from app.dashboards import Dashboard
 from app.dashboards.services import DashboardService
 from app.database import DatabaseService
-from app.exceptions import CreateForbiddenTaskException, DataConflictException, ObjectNotFoundException
+from app.exceptions import CreateForbiddenTaskException, DataConflictException, ObjectNotFoundException, \
+    WrongUserIdsException, IntegrityException
 from app.projects import Project
 from app.stories.services import StoriesService
-from app.tasks import Task
+from app.tasks import Task, ResponsibleTask
 from app.tasks.schemas import TaskCreateSchema, TaskUpdateSchema, TaskMovingDashboard
 
 
@@ -58,7 +62,8 @@ class TaskService(DatabaseService):
 
     @classmethod
     async def get_task(cls, session: AsyncSession, user: UserRead, task_id: int):
-        task = await cls.get_task_dashboard_project(session, task_id)
+        options = [selectinload(Task.responsible_users)]
+        task = await cls.get_task_dashboard_project(session, task_id, options)
         cls.access_check(user, task.dashboard)
         return task
 
@@ -93,6 +98,23 @@ class TaskService(DatabaseService):
         task = await cls.get_task_dashboard_project(session, task_id)
         cls.access_check(user, task.dashboard)
         return await cls.change_index_task(session, task, index)
+
+    @classmethod
+    async def task_assign_responsible(cls, session: AsyncSession, user: UserRead, task_id: int, user_ids: List[int]):
+        task = await cls.get_task_dashboard_project(session, task_id)
+        cls.access_check(user, task.dashboard)
+        user_ids_set = set(user_ids)
+        invited_user_ids = {users.id for users in task.dashboard.project.invited_users}
+        all_users_exist = user_ids_set.issubset(invited_user_ids)
+        if not all_users_exist:
+            raise WrongUserIdsException
+        responsible_tasks = [ResponsibleTask(task_id=task_id, responsible_id=user_id) for user_id in user_ids]
+        try:
+            session.add_all(responsible_tasks)
+            await session.commit()
+        except IntegrityError:
+            raise IntegrityException
+        return responsible_tasks
 
     @classmethod
     async def change_index_task(cls, session: AsyncSession,
@@ -162,10 +184,11 @@ class TaskService(DatabaseService):
         return dashboard
 
     @classmethod
-    async def get_task_dashboard_project(cls, session: AsyncSession, task_id: int):
+    async def get_task_dashboard_project(cls, session: AsyncSession, task_id: int, options: List = []):
         options = [
             selectinload(Task.dashboard).options(selectinload(Dashboard.project).selectinload(Project.invited_users)),
-            selectinload(Task.creator)
+            selectinload(Task.creator),
+            *options
         ]
         task = await cls.get_detail(session, {'id': task_id}, options)
         if not task:
@@ -176,3 +199,7 @@ class TaskService(DatabaseService):
     async def total_task_in_dashboard(cls, session, dashboard_id):
         total_task = await session.execute(select(func.count()).where(cls.model.dashboard_id == dashboard_id))
         return total_task.scalar()
+
+
+class ResponsibleTaskService(DatabaseService):
+    model = ResponsibleTask

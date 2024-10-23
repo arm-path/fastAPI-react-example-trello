@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import List, TYPE_CHECKING
 
-from sqlalchemy import String, ForeignKey, text, Integer
+from sqlalchemy import String, ForeignKey, text, Integer, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
@@ -36,5 +36,8 @@ class ResponsibleTask(Base):
     task_id: Mapped[int] = mapped_column(ForeignKey('task.id', ondelete='CASCADE'), nullable=False)
     responsible_id: Mapped[int] = mapped_column(ForeignKey('user.id', ondelete='CASCADE'), nullable=False)
 
+    __table_args__ = (UniqueConstraint('task_id', 'responsible_id'),)
+
     def __str__(self):
         return f'<ResponsibleTask {self.id}: {self.task_id} - {self.responsible_id}>'
+
