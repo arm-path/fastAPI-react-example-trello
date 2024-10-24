@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 
 
 class File(Base):
-    __tablename__ = 'base'
+    __tablename__ = 'file'
     task_id: Mapped[int] = mapped_column(ForeignKey('task.id', ondelete='CASCADE'), nullable=False)
     user_id: Mapped[int] = mapped_column(ForeignKey('user.id', ondelete='CASCADE'), nullable=False)
     created: Mapped[datetime] = mapped_column(DateTime, server_default=text("TIMEZONE('utc', now())"))
