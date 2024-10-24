@@ -19,6 +19,15 @@ class Settings(BaseSettings):
         'pk': 'pk_%(table_name)s',
     }
 
+    ALLOWED_MIME_TYPES: list[str] = [
+        'image/jpeg',
+        'image/png',
+        'image/gif',
+        'video/mp4',
+        'video/x-msvideo',
+        'application/pdf'
+    ]
+
     @property
     def database_url(self):
         return f'postgresql+asyncpg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}'

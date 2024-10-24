@@ -46,11 +46,11 @@ class StoriesService(DatabaseService):
 
     @classmethod
     async def story_task_moving_dashboard(cls,
-                                             session: AsyncSession,
-                                             user: UserRead,
-                                             project_id: int,
-                                             old_dashboard_id: int,
-                                             dashboard_id: int):
+                                          session: AsyncSession,
+                                          user: UserRead,
+                                          project_id: int,
+                                          old_dashboard_id: int,
+                                          dashboard_id: int):
         description = f' Moving dashboard_id: {old_dashboard_id} -> dashboard_id: {dashboard_id}'
         values = {'action': 'Moving task by dashboard',
                   'user_id': user.id,
@@ -65,3 +65,13 @@ class StoriesService(DatabaseService):
                 f'dashboard_id: {task.dashboard_id}, '
                 f'description: {task.description}, '
                 f'deadline: {task.deadline}')
+
+    @classmethod
+    async def story_task_load_file(cls, session: AsyncSession, user: UserRead, project_id: int, path_to_file: str):
+        values = {
+            'action': 'Load file',
+            'user_id': user.id,
+            'project_id': project_id,
+            'description': f'Load file f{path_to_file}'
+        }
+        await cls.create(session, values)

@@ -11,6 +11,12 @@ ObjectNotFoundException = lambda obj: HTTPException(
     detail={'msg': f'{obj} not found'}
 )
 
+UnexpectedErrorOccurred = HTTPException(
+    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+    detail = {'msg': 'Unexpected error occurred'}
+)
+
+
 # Database exceptions.
 UniqueViolationException = HTTPException(
     status_code=status.HTTP_409_CONFLICT,
@@ -62,4 +68,20 @@ CreateForbiddenTaskException = HTTPException(
 WrongUserIdsException = HTTPException(
     status_code=status.HTTP_409_CONFLICT,
     detail={'msg': 'Invalid user_ids passed'}
+)
+
+# Files
+HighFileSizeException = HTTPException(
+    status_code=status.HTTP_409_CONFLICT,
+    detail={'msg': 'High file size'}
+)
+
+UnsupportedFileTypeException = HTTPException(
+    status_code=status.HTTP_409_CONFLICT,
+    detail={'msg': 'Unsupported file type'}
+)
+
+FileSystemErrorException = HTTPException(
+    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+    detail={'msg': 'File system error'}
 )

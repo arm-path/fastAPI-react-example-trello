@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from starlette.staticfiles import StaticFiles
 
 from app.dashboards.routers import router as dashboard_router
 from app.projects.routers import router as project_router
@@ -9,6 +10,9 @@ from app.files.routers import router as file_router
 from app.stories.routers import router as story_router
 
 app = FastAPI()
+
+app.mount('/static', StaticFiles(directory='static'), name='static')
+
 app.include_router(authentication_router)
 app.include_router(user_router)
 app.include_router(project_router)
