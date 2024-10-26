@@ -21,14 +21,16 @@ class TaskUpdateSchema(TaskBaseSchema):
     description: str | None = None
 
 
-class TaskDetailSchema(TaskCreateSchema):
+class TaskDetailSchema(TaskBaseSchema):
     created: datetime
     updated: datetime
     id: int
     index: int
     creator: UserInformationSchema
 
+
 class TaskExtendedDetailSchema(TaskDetailSchema):
+    description: str | None = None
     responsible_users: List[UserInformationSchema] = Field(..., serialization_alias='responsible')
     files: List[FileCreateResponseSchema]
 

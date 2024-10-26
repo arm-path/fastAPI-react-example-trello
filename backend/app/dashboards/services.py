@@ -2,6 +2,7 @@ from typing import List
 
 from sqlalchemy import select, Result, func
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from app.dashboards import Dashboard
 from app.dashboards.schemas import DashboardCreateSchema, DashboardReadSchema, DashboardUpdateSchema
@@ -49,7 +50,7 @@ class DashboardService(DatabaseService):
         filters = {'id': dashboard_id}
         values = data.model_dump()
         values['project_id'] = project_id
-        return await cls.update(session, filters, values)
+        return await cls.update(session, filters, values, [selectinload(cls.model.tasks)])
 
     @classmethod
     async def delete_dashboard(cls, session: AsyncSession, user: UserRead, project_id: int, dashboard_id: int) -> None:
@@ -63,7 +64,7 @@ class DashboardService(DatabaseService):
                              project_id: int) -> List[DashboardReadSchema]:
         await cls.check_project(session, user, project_id)
         filters = {'project_id': project_id}
-        return await cls.get_list(session, filters)
+        return await cls.get_list(session, filters, [selectinload(cls.model.tasks)])
 
     @classmethod
     async def get_dashboard(cls, session: AsyncSession,
@@ -72,7 +73,7 @@ class DashboardService(DatabaseService):
                             dashboard_id: int) -> DashboardReadSchema:
         await cls.check_project(session, user, project_id)
         filters = {'id': dashboard_id, 'project_id': project_id}
-        return await cls.get_detail(session, filters)
+        return await cls.get_detail(session, filters, [selectinload(cls.model.tasks)])
 
     @classmethod
     async def moving_dashboard(cls, session: AsyncSession,

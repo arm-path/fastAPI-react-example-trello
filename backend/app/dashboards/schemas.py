@@ -1,4 +1,8 @@
+from typing import List
+
 from pydantic import BaseModel
+
+from app.tasks.schemas import TaskDetailSchema
 
 
 class DashboardBaseSchema(BaseModel):
@@ -18,6 +22,7 @@ class DashboardReadSchema(DashboardBaseSchema):
     id: int
     index: int
     project_id: int
+    tasks: List[TaskDetailSchema]
 
 
 class DashboardMovingSchema(BaseModel):
