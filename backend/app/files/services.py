@@ -2,6 +2,7 @@ import os
 
 from fastapi import UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from app.authentication.schemas import UserRead
 from app.database import DatabaseService
@@ -48,6 +49,11 @@ class FileService(DatabaseService):
         await cls.delete(session, {'id': file.id})
         await StoriesService.story_task_delete_file(session, user, task.dashboard.project_id, task.id)
 
+    @classmethod
+    async def get_files(cls, session: AsyncSession, user: UserRead, task_id: int):
+        task = await TaskService.get_task_dashboard_project(session, task_id)
+        TaskService.access_check(user, task.dashboard)
+        return await cls.get_list(session, {'task_id': task.id}, [selectinload(cls.model.user)])
 
     @classmethod
     def check_file(cls, file: UploadFile):
