@@ -85,3 +85,8 @@ FileSystemErrorException = HTTPException(
     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
     detail={'msg': 'File system error'}
 )
+
+FileNotFoundException = HTTPException(
+    status_code=status.HTTP_404_NOT_FOUND,
+    detail={'msg': 'File not found'}
+)

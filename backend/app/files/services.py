@@ -5,8 +5,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.authentication.schemas import UserRead
 from app.database import DatabaseService
-from app.exceptions import HighFileSizeException, UnsupportedFileTypeException, FileSystemErrorException, \
-    UnexpectedErrorOccurred
+from app.exceptions import (HighFileSizeException,
+                            UnsupportedFileTypeException,
+                            FileSystemErrorException,
+                            UnexpectedErrorOccurred,
+                            FileNotFoundException)
 from app.files import File
 from app.settings import settings
 from app.stories.services import StoriesService
@@ -24,8 +27,27 @@ class FileService(DatabaseService):
         path_to_file = cls.generate_path(task.dashboard.project_id, task.dashboard_id, file.filename)
         await cls.save_file(file, path_to_file)
         values = {'task_id': task.id, 'user_id': user.id, 'url': path_to_file}
-        await cls.create(session, values)
+        file = await cls.create(session, values)
         await StoriesService.story_task_load_file(session, user, task.dashboard.project_id, path_to_file)
+        return file
+
+    @classmethod
+    async def delete_file(cls, session: AsyncSession, user: UserRead, file_id: int):
+        file = await cls.get_detail(session, {'id': file_id})
+        if not file:
+            raise FileNotFoundException
+        task = await TaskService.get_task_dashboard_project(session, file.task_id)
+        TaskService.access_check(user, task.dashboard)
+        try:
+            os.remove(file.url)
+        except FileNotFoundError:
+            raise FileNotFoundException
+        except Exception as e:
+            raise UnexpectedErrorOccurred
+
+        await cls.delete(session, {'id': file.id})
+        await StoriesService.story_task_delete_file(session, user, task.dashboard.project_id, task.id)
+
 
     @classmethod
     def check_file(cls, file: UploadFile):

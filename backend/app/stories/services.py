@@ -75,3 +75,13 @@ class StoriesService(DatabaseService):
             'description': f'Load file f{path_to_file}'
         }
         await cls.create(session, values)
+
+    @classmethod
+    async def story_task_delete_file(cls, session: AsyncSession, user: UserRead, project_id: int, task_id: int):
+        values = {
+            'action': 'Delete file',
+            'user_id': user.id,
+            'project_id': project_id,
+            'description': f'Removing a file from a task {task_id}'
+        }
+        await cls.create(session, values)
