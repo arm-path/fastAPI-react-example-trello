@@ -3,6 +3,7 @@ from typing import List
 
 from pydantic import BaseModel, Field
 
+from app.files.schemas import FileCreateResponseSchema
 from app.users.schemas import UserInformationSchema
 
 
@@ -29,6 +30,7 @@ class TaskDetailSchema(TaskCreateSchema):
 
 class TaskExtendedDetailSchema(TaskDetailSchema):
     responsible_users: List[UserInformationSchema] = Field(..., serialization_alias='responsible')
+    files: List[FileCreateResponseSchema]
 
 
 class TaskMovingSchema(BaseModel):

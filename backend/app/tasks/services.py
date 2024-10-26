@@ -62,7 +62,7 @@ class TaskService(DatabaseService):
 
     @classmethod
     async def get_task(cls, session: AsyncSession, user: UserRead, task_id: int):
-        options = [selectinload(Task.responsible_users)]
+        options = [selectinload(Task.responsible_users), selectinload(Task.files)]
         task = await cls.get_task_dashboard_project(session, task_id, options)
         cls.access_check(user, task.dashboard)
         return task
