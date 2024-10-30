@@ -1,10 +1,11 @@
 import axios from 'axios'
 
 const instance = axios.create({
-    baseURL: 'http://127.0.0.1:8000/auth',
+    baseURL: 'http://localhost:8000/auth',
+    withCredentials: true,
 })
 
-type RegistrationResponse = {
+export type RegistrationResponse = {
     id: number
     email: string
     is_active: boolean
@@ -18,8 +19,10 @@ type LoginResponse = {
 }
 
 export const authenticationAPI = {
-    async registration(email: string, password: string): Promise<RegistrationResponse> {
-        return await instance.post('/register/', {email, password})
+    async registration(email: string, password: string) {
+        return await instance.post('/register', {email, password})
+            .then((response) => response)
+            .catch((error) => error.response)
     },
     async login(username: string, password: string): Promise<LoginResponse> {
         return await instance.post('/login/', {username, password})

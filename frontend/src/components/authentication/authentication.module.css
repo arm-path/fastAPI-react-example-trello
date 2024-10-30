@@ -15,6 +15,13 @@
     box-sizing: border-box;
 }
 
-.formTitle{
+.formTitle {
     text-align: center;
+}
+
+.error {
+    margin-bottom: 0.3rem;
+    font-weight: bold;
+    text-align: center;
+    color: #dc3747;
 }
