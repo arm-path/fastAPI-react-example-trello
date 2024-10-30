@@ -1,4 +1,5 @@
 import axios from 'axios'
+import qs from 'qs'
 
 const instance = axios.create({
     baseURL: 'http://localhost:8000/auth',
@@ -6,11 +7,14 @@ const instance = axios.create({
 })
 
 export type RegistrationResponse = {
-    id: number
-    email: string
-    is_active: boolean
-    is_superuser: boolean
-    is_verified: boolean
+    data: {
+        id: number
+        email: string
+        is_active: boolean
+        is_superuser: boolean
+        is_verified: boolean
+    }
+
 }
 
 type LoginResponse = {
@@ -24,7 +28,9 @@ export const authenticationAPI = {
             .then((response) => response)
             .catch((error) => error.response)
     },
-    async login(username: string, password: string): Promise<LoginResponse> {
-        return await instance.post('/login/', {username, password})
+    async login(username: string, password: string) {
+        return await instance.post('/login/', qs.stringify({username, password}))
+            .then((response) => response)
+            .catch((error) => error.response)
     }
 }

@@ -1,5 +1,6 @@
 .container {
-    display: grid;
+    display: flex;
+    align-items: center;
 }
 
 .navigation {
@@ -8,4 +9,18 @@
 
 .auxiliary {
 
+}
+
+.link {
+    text-decoration: none;
+    color: #272822;
+}
+
+.link:hover {
+    color: #737478;
+}
+
+.linkAct {
+    text-decoration: none;
+    color: #744cb5;
 }

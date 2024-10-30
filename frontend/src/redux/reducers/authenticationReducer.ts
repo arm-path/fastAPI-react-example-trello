@@ -1,5 +1,5 @@
 import {createAsyncThunk, createSlice} from '@reduxjs/toolkit'
-import {authenticationAPI} from "../../api/authenticationAPI.ts";
+import {authenticationAPI} from '../../api/authenticationAPI.ts'
 
 const initialState: initialStateType = {
     access_token: '',
@@ -33,7 +33,20 @@ export const registrationThunk = createAsyncThunk(
             const response = await authenticationAPI.registration('email', 'password')
             return response.data
         }
+    }
+)
 
+export const authenticationThunk = createAsyncThunk(
+    'authentication/authentication',
+    async (arg, thunkApi) => {
+        const email = thunkApi.getState().authentication.form.email
+        const password = thunkApi.getState().authentication.form.password
+        if (email.error || !email.value || password.error || !password.value) {
+            thunkApi.dispatch(checkFormAC())
+        } else {
+            const response = await authenticationAPI.login(email.value, password.value)
+            return response.data
+        }
     }
 )
 
@@ -84,11 +97,23 @@ const authenticationSlice = createSlice({
         },
         checkFormAC(state, action) {
             state.form.error = 'В форме регистрации имеются ошибки'
+        },
+        clearFormAC(state, action) {
+            state.form.error = ''
+            state.form.email.error = ''
+            state.form.email.value = ''
+            state.form.password.error = ''
+            state.form.password.value = ''
         }
     },
     extraReducers: (builder) => {
         builder.addCase(registrationThunk.fulfilled, (state, action) => {
-            if (action.payload){
+            if (action.payload) {
+                console.log(action.payload)
+            }
+        })
+        builder.addCase(authenticationThunk.fulfilled, (state, action) => {
+            if (action.payload) {
                 console.log(action.payload)
             }
         })
@@ -103,5 +128,6 @@ export const {
     checkEmailFormAC,
     checkPasswordFormAC,
     checkFormAC,
+    clearFormAC
 } = authenticationSlice.actions
 

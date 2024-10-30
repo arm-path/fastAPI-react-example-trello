@@ -25,3 +25,12 @@
     text-align: center;
     color: #dc3747;
 }
+
+.link {
+    text-decoration: none;
+    color: #272822;
+}
+
+.link:hover {
+    color: #737478;
+}
