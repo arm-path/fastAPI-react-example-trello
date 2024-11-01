@@ -1,9 +1,29 @@
-import {createAsyncThunk, createSlice} from '@reduxjs/toolkit'
-import {authenticationAPI} from '../../api/authenticationAPI.ts'
+import {createAsyncThunk, createSlice, PayloadAction} from '@reduxjs/toolkit'
+import Cookies from 'js-cookie'
 
-const initialState: initialStateType = {
-    access_token: '',
-    token_type: 'bearer',
+import {authenticationAPI, LoginResponseType, RegistrationResponseType} from '../../api/authenticationAPI.ts'
+import {ThunkApiConfig} from '../store.ts'
+import {initializeApp} from './appReducer'
+
+type FormFieldType = {
+    title: string;
+    value: string;
+    error: string;
+}
+
+type  FormStateType = {
+    email: FormFieldType;
+    password: FormFieldType;
+    valid: boolean;
+    error: string;
+    success: string
+}
+
+type InitialStateType = {
+    form: FormStateType;
+}
+
+const initialState: InitialStateType = {
     form: {
         email: {
             title: 'Email',
@@ -16,36 +36,50 @@ const initialState: initialStateType = {
             error: ''
         },
         valid: false,
-        errors: ''
+        error: '',
+        success: ''
     }
 }
 
-type initialStateType = typeof initialState
 
-export const registrationThunk = createAsyncThunk(
+export const registrationThunk = createAsyncThunk<
+    RegistrationResponseType | undefined,
+    void,
+    ThunkApiConfig>
+(
     'authentication/registration',
-    async (arg, thunkApi) => {
+    async (_, thunkApi) => {
+
         const email = thunkApi.getState().authentication.form.email
         const password = thunkApi.getState().authentication.form.password
         if (email.error || !email.value || password.error || !password.value) {
             thunkApi.dispatch(checkFormAC())
         } else {
             const response = await authenticationAPI.registration('email', 'password')
-            return response.data
+            return {'status': response.status, 'data': response.data}
         }
     }
 )
 
-export const authenticationThunk = createAsyncThunk(
+
+export const authenticationThunk = createAsyncThunk<
+    LoginResponseType | undefined,
+    void,
+    ThunkApiConfig>
+(
     'authentication/authentication',
-    async (arg, thunkApi) => {
+    async (_, thunkApi) => {
         const email = thunkApi.getState().authentication.form.email
         const password = thunkApi.getState().authentication.form.password
         if (email.error || !email.value || password.error || !password.value) {
             thunkApi.dispatch(checkFormAC())
         } else {
             const response = await authenticationAPI.login(email.value, password.value)
-            return response.data
+            if (response.status === 200) {
+                Cookies.set('access_token', response.data.access_token)
+                thunkApi.dispatch(initializeApp())
+            }
+            return {'status': response.status, 'data': response.data}
         }
     }
 )
@@ -55,21 +89,21 @@ const authenticationSlice = createSlice({
     name: 'authentication',
     initialState,
     reducers: {
-        changeEmailFormAC(state, action) {
+        changeEmailFormAC(state, action: PayloadAction<string>) {
             state.form.email.value = action.payload
             state.form.error = ''
         },
-        changePasswordFormAC(state, action) {
+        changePasswordFormAC(state, action: PayloadAction<string>) {
             state.form.password.value = action.payload
             state.form.error = ''
         },
-        checkEmailFormAC(state, action) {
+        checkEmailFormAC(state, action: PayloadAction<string>) {
             const email = action.payload
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailRegex.test(email) && email) state.form.email.error = 'Не валидный формат'
             else state.form.email.error = ''
         },
-        checkPasswordFormAC(state, action) {
+        checkPasswordFormAC(state, action: PayloadAction<string>) {
             const password = action.payload
             const minLength: number = 8;
             const hasUpperCase: boolean = /[A-Z]/.test(password);
@@ -81,13 +115,13 @@ const authenticationSlice = createSlice({
                 if (password.length < minLength) {
                     state.form.password.error = `Пароль должен содержать не менее ${minLength} символов.`
                 } else if (!hasUpperCase) {
-                    state.form.password.error = "Пароль должен содержать хотя бы одну заглавную букву."
+                    state.form.password.error = 'Пароль должен содержать хотя бы одну заглавную букву.'
                 } else if (!hasLowerCase) {
-                    state.form.password.error = "Пароль должен содержать хотя бы одну строчную букву."
+                    state.form.password.error = 'Пароль должен содержать хотя бы одну строчную букву.'
                 } else if (!hasNumbers) {
-                    state.form.password.error = "Пароль должен содержать хотя бы одну цифру."
+                    state.form.password.error = 'Пароль должен содержать хотя бы одну цифру.'
                 } else if (!hasSpecialChars) {
-                    state.form.password.error = "Пароль должен содержать хотя бы один специальный символ."
+                    state.form.password.error = 'Пароль должен содержать хотя бы один специальный символ.'
                 } else {
                     state.form.password.error = ''
                 }
@@ -95,10 +129,10 @@ const authenticationSlice = createSlice({
                 state.form.password.error = ''
             }
         },
-        checkFormAC(state, action) {
+        checkFormAC(state) {
             state.form.error = 'В форме регистрации имеются ошибки'
         },
-        clearFormAC(state, action) {
+        clearFormAC(state) {
             state.form.error = ''
             state.form.email.error = ''
             state.form.email.value = ''
@@ -108,17 +142,30 @@ const authenticationSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder.addCase(registrationThunk.fulfilled, (state, action) => {
-            if (action.payload) {
-                console.log(action.payload)
+            if (action.payload) if (action.payload.status === 200) {
+                state.form.success = 'Пользователь успешно зарегистрирован, проверьте почту'
+            } else if (action.payload.status === 400) {
+                state.form.error = 'Пользователь уже существует'
+            } else if (action.payload.status === 422) {
+                state.form.error = 'Ошибка валидации данных'
+            } else {
+                state.form.error = 'Произошла ошибка на стороне сервера'
             }
         })
         builder.addCase(authenticationThunk.fulfilled, (state, action) => {
             if (action.payload) {
-                console.log(action.payload)
+                if (action.payload.status === 200) {
+                    state.form.success = 'Пользователь успешно авторизовался'
+                } else if (action.payload.status === 400) {
+                    state.form.error = 'Неверно введен Email или Password'
+                } else if (action.payload.status === 422) {
+                    state.form.error = 'Ошибка валидации данных'
+                } else {
+                    state.form.error = 'Произошла ошибка на стороне сервера'
+                }
             }
         })
     }
-
 })
 
 export const authenticationReducer = authenticationSlice.reducer
@@ -128,6 +175,6 @@ export const {
     checkEmailFormAC,
     checkPasswordFormAC,
     checkFormAC,
-    clearFormAC
+    clearFormAC,
 } = authenticationSlice.actions
 

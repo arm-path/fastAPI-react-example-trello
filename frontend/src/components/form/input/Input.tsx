@@ -1,6 +1,17 @@
 import classes from './Input.module.css'
+import React from "react";
 
-const Input = ({type, placeholder, value, error, onchangeHandler, onBlurHandler}) => {
+type InputPropsType = {
+    type?: string,
+    placeholder: string,
+    value: string,
+    error: string,
+    onchangeHandler: (e: React.ChangeEvent<HTMLInputElement>) => void
+    onBlurHandler?: () => void
+
+}
+
+const Input = ({type, placeholder, value, error, onchangeHandler, onBlurHandler}: InputPropsType) => {
     return (
         <div>
             <span className={classes.msgError}>{error}</span>

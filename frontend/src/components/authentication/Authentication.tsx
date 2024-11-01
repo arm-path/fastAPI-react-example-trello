@@ -1,20 +1,20 @@
-import {useEffect} from 'react'
+import React, {useEffect} from 'react'
 import {NavLink} from 'react-router-dom'
 
-import classes from "./authentication.module.css";
-import Input from "../form/input/Input.tsx";
+import classes from './authentication.module.css'
+import Input from '../form/input/Input.tsx'
 import {
     authenticationThunk,
     changeEmailFormAC,
     changePasswordFormAC,
     checkEmailFormAC,
     clearFormAC
-} from "../../redux/reducers/authenticationReducer.ts";
-import Button from "../form/button/Button.tsx";
-import {useAppDispatch, useAppSelector} from "../../redux/hooks.ts";
+} from '../../redux/reducers/authenticationReducer.ts'
+import Button from '../form/button/Button.tsx'
+import {useAppDispatch, useAppSelector} from '../../redux/hooks.ts'
 
 
-const Authentication = (props) => {
+const Authentication = () => {
     const form = useAppSelector(state => state.authentication.form)
     const dispatch = useAppDispatch()
 
@@ -31,14 +31,14 @@ const Authentication = (props) => {
                        placeholder={form.email.title}
                        value={form.email.value}
                        error={form.email.error}
-                       onchangeHandler={(e) => dispatch(changeEmailFormAC(e.target.value))}
-                       onBlurHandler={(e) => dispatch(checkEmailFormAC(form.email.value))}
+                       onchangeHandler={(e: React.ChangeEvent<HTMLInputElement>) => dispatch(changeEmailFormAC(e.target.value))}
+                       onBlurHandler={() => dispatch(checkEmailFormAC(form.email.value))}
                 />
                 <Input type='password'
                        placeholder={form.password.title}
                        value={form.password.value}
                        error={form.password.error}
-                       onchangeHandler={(e) => dispatch(changePasswordFormAC(e.target.value))}
+                       onchangeHandler={(e: React.ChangeEvent<HTMLInputElement>) => dispatch(changePasswordFormAC(e.target.value))}
                 />
                 <div className={classes.formTitle}>
                     <NavLink className={classes.link} to='/registration'>Регистрация</NavLink>
