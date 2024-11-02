@@ -1,29 +1,24 @@
 import {useEffect} from 'react'
-import {Route, Routes, useNavigate} from 'react-router-dom'
+import {Route, Routes} from 'react-router-dom'
 
 import './App.css'
-import {useAppDispatch, useAppSelector} from './redux/hooks.ts'
-import Header from './components/base/Header.tsx'
-import Registration from './components/authentication/Registration.tsx'
-import Authentication from './components/authentication/Authentication.tsx'
-import {initializeApp} from './redux/reducers/appReducer.ts'
+import {useAppDispatch} from './redux/hooks'
+import Header from './components/base/Header'
 
+import Login from './components/auth/Login'
+import Register from './components/auth/Register'
+import {initializeApp} from './redux/reducers/appReducer'
+import Projects from './components/project/Projects'
 
 
 function App() {
     const dispatch = useAppDispatch()
-    const isInitialized = useAppSelector(state => state.app.initialization)
-    const navigate = useNavigate()
 
     useEffect(() => {
         dispatch(initializeApp())
     }, [dispatch])
 
-    useEffect(() => {
-        if (isInitialized) {
-            navigate('/authentication')
-        }
-    }, []);
+
     return (
         <div>
             <div className='header'>
@@ -31,8 +26,9 @@ function App() {
             </div>
             <div className='content'>
                 <Routes>
-                    <Route path='/registration' element={<Registration/>}/>
-                    <Route path='/authentication' element={<Authentication/>}/>
+                    <Route path='/register' element={<Register/>}/>
+                    <Route path='/login' element={<Login/>}/>
+                    <Route path='/projects' element={<Projects />}/>
                 </Routes>
             </div>
         </div>

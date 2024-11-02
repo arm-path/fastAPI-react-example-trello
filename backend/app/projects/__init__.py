@@ -1,8 +1,8 @@
 __all__ = (
-    'Project',
+    'Projects',
     'ProjectUsers',
 )
 
-from app.projects.models import Project
+from app.projects.models import Projects
 from app.projects.models import ProjectUsers
 

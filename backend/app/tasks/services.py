@@ -11,7 +11,7 @@ from app.dashboards.services import DashboardService
 from app.database import DatabaseService
 from app.exceptions import CreateForbiddenTaskException, DataConflictException, ObjectNotFoundException, \
     WrongUserIdsException, IntegrityException
-from app.projects import Project
+from app.projects import Projects
 from app.stories.services import StoriesService
 from app.tasks import Task, ResponsibleTask
 from app.tasks.schemas import TaskCreateSchema, TaskUpdateSchema, TaskMovingDashboard
@@ -194,7 +194,7 @@ class TaskService(DatabaseService):
     @classmethod
     async def get_dashboard_project(cls, session: AsyncSession, dashboard_id: int):
         options = [
-            selectinload(Dashboard.project).selectinload(Project.invited_users)
+            selectinload(Dashboard.project).selectinload(Projects.invited_users)
         ]
         dashboard = await DashboardService.get_detail(session, {'id': dashboard_id}, options)
         if not dashboard:
@@ -204,7 +204,7 @@ class TaskService(DatabaseService):
     @classmethod
     async def get_task_dashboard_project(cls, session: AsyncSession, task_id: int, options: List = []):
         options = [
-            selectinload(Task.dashboard).options(selectinload(Dashboard.project).selectinload(Project.invited_users)),
+            selectinload(Task.dashboard).options(selectinload(Dashboard.project).selectinload(Projects.invited_users)),
             selectinload(Task.creator),
             *options
         ]

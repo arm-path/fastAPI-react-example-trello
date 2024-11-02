@@ -1,9 +1,10 @@
 import {createAsyncThunk, createSlice, PayloadAction} from '@reduxjs/toolkit'
 import Cookies from 'js-cookie'
 
-import {authenticationAPI, LoginResponseType, RegistrationResponseType} from '../../api/authenticationAPI.ts'
-import {ThunkApiConfig} from '../store.ts'
-import {initializeApp} from './appReducer'
+import {authAPI, LoginResponseType, RegisterResponseType} from '../../api/authAPI.ts'
+import {ThunkApiConfig} from '../store'
+import {changeIsAuthAC} from './appReducer'
+import {APIResponseType} from '../../api/api'
 
 type FormFieldType = {
     title: string;
@@ -42,43 +43,44 @@ const initialState: InitialStateType = {
 }
 
 
-export const registrationThunk = createAsyncThunk<
-    RegistrationResponseType | undefined,
+export const registerThunk = createAsyncThunk<
+    APIResponseType<RegisterResponseType> | undefined,
     void,
     ThunkApiConfig>
 (
-    'authentication/registration',
+    'auth/register',
     async (_, thunkApi) => {
 
-        const email = thunkApi.getState().authentication.form.email
-        const password = thunkApi.getState().authentication.form.password
+        const email = thunkApi.getState().auth.form.email
+        const password = thunkApi.getState().auth.form.password
         if (email.error || !email.value || password.error || !password.value) {
             thunkApi.dispatch(checkFormAC())
         } else {
-            const response = await authenticationAPI.registration('email', 'password')
+            const response = await authAPI.register(email.value, password.value)
             return {'status': response.status, 'data': response.data}
         }
     }
 )
 
 
-export const authenticationThunk = createAsyncThunk<
-    LoginResponseType | undefined,
+export const authThunk = createAsyncThunk<
+    APIResponseType<LoginResponseType> | undefined,
     void,
     ThunkApiConfig>
 (
-    'authentication/authentication',
+    'auth/auth',
     async (_, thunkApi) => {
-        const email = thunkApi.getState().authentication.form.email
-        const password = thunkApi.getState().authentication.form.password
+        const email = thunkApi.getState().auth.form.email
+        const password = thunkApi.getState().auth.form.password
         if (email.error || !email.value || password.error || !password.value) {
             thunkApi.dispatch(checkFormAC())
         } else {
-            const response = await authenticationAPI.login(email.value, password.value)
+            const response = await authAPI.login(email.value, password.value)
             if (response.status === 200) {
                 Cookies.set('access_token', response.data.access_token)
-                thunkApi.dispatch(initializeApp())
-            }
+                thunkApi.dispatch(changeIsAuthAC(true))
+            } else thunkApi.dispatch(changeIsAuthAC(false))
+
             return {'status': response.status, 'data': response.data}
         }
     }
@@ -141,9 +143,11 @@ const authenticationSlice = createSlice({
         }
     },
     extraReducers: (builder) => {
-        builder.addCase(registrationThunk.fulfilled, (state, action) => {
-            if (action.payload) if (action.payload.status === 200) {
+        builder.addCase(registerThunk.fulfilled, (state, action) => {
+            if (action.payload) if (action.payload.status === 201) {
                 state.form.success = 'Пользователь успешно зарегистрирован, проверьте почту'
+                state.form.email.value = ''
+                state.form.password.value = ''
             } else if (action.payload.status === 400) {
                 state.form.error = 'Пользователь уже существует'
             } else if (action.payload.status === 422) {
@@ -152,10 +156,12 @@ const authenticationSlice = createSlice({
                 state.form.error = 'Произошла ошибка на стороне сервера'
             }
         })
-        builder.addCase(authenticationThunk.fulfilled, (state, action) => {
+        builder.addCase(authThunk.fulfilled, (state, action) => {
             if (action.payload) {
                 if (action.payload.status === 200) {
                     state.form.success = 'Пользователь успешно авторизовался'
+                    state.form.email.value = ''
+                    state.form.password.value = ''
                 } else if (action.payload.status === 400) {
                     state.form.error = 'Неверно введен Email или Password'
                 } else if (action.payload.status === 422) {
@@ -168,7 +174,7 @@ const authenticationSlice = createSlice({
     }
 })
 
-export const authenticationReducer = authenticationSlice.reducer
+export const authReducer = authenticationSlice.reducer
 export const {
     changeEmailFormAC,
     changePasswordFormAC,

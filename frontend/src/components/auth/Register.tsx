@@ -1,7 +1,7 @@
 import React, {useEffect} from 'react'
 import {NavLink} from 'react-router-dom'
 
-import classes from './authentication.module.css'
+import classes from './auth.module.css'
 import Input from '../form/input/Input.tsx'
 import Button from '../form/button/Button.tsx'
 
@@ -12,13 +12,12 @@ import {
     checkEmailFormAC,
     checkPasswordFormAC,
     clearFormAC,
-    registrationThunk
-} from '../../redux/reducers/authenticationReducer'
+    registerThunk
+} from '../../redux/reducers/authReducer.ts'
 
 
-
-const Registration = () => {
-    const form = useAppSelector(state => state.authentication.form)
+const Register = () => {
+    const form = useAppSelector(state => state.auth.form)
     const dispatch = useAppDispatch()
     useEffect(() => {
         dispatch(clearFormAC())
@@ -28,6 +27,7 @@ const Registration = () => {
             <div className={classes.formContainer}>
                 <h2 className={classes.formTitle}>Регистрация</h2>
                 <div className={classes.error}>{form.error}</div>
+                <div className={classes.success}>{form.success}</div>
                 <Input type='text'
                        placeholder={form.email.title}
                        value={form.email.value}
@@ -45,16 +45,16 @@ const Registration = () => {
                        onBlurHandler={() => dispatch(checkPasswordFormAC(form.password.value))}
                 />
                 <div className={classes.formTitle}>
-                    <NavLink className={classes.link} to='/authentication'>Вход</NavLink>
+                    <NavLink className={classes.link} to='/login'>Вход</NavLink>
                 </div>
                 <Button type='button'
                         title='Регистрация'
                         style='success'
-                        onClickHandler={() => dispatch(registrationThunk())}
+                        onClickHandler={() => dispatch(registerThunk())}
                 />
             </div>
         </div>
     )
 }
 
-export default Registration
+export default Register

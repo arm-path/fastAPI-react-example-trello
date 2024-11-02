@@ -4,7 +4,7 @@ from sqlalchemy.orm import selectinload, defer
 
 from app.authentication.schemas import UserRead
 from app.database.services import DatabaseService
-from app.projects import Project, ProjectUsers
+from app.projects import Projects, ProjectUsers
 from app.users import User
 
 
@@ -18,10 +18,10 @@ class UserService(DatabaseService):
     @classmethod
     async def get_other_projects(cls, session: AsyncSession, user: UserRead, accepted):
         query: Select = (
-            select(Project)
-            .join(Project.invitations)
+            select(Projects)
+            .join(Projects.invitations)
             .filter(ProjectUsers.invited_id == user.id, ProjectUsers.accepted == accepted)
-            .options(selectinload(Project.user).options(defer(User.hashed_password)), defer(Project.user_id))
+            .options(selectinload(Projects.user).options(defer(User.hashed_password)), defer(Projects.user_id))
         )
         results: Result[tuple[cls.model]] = await session.execute(query)
         return results.scalars().all()

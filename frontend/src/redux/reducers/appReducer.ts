@@ -1,39 +1,47 @@
-import {createSlice, PayloadAction} from '@reduxjs/toolkit'
+import {createSlice, PayloadAction, Slice} from '@reduxjs/toolkit'
 
 import userAPI from '../../api/userAPI'
+import {AppDispatch} from '../store.ts'
 
 
 type InitialStateType = {
+    isAuth: boolean,
     initialization: boolean;
 }
 
 const initialState: InitialStateType = {
+    isAuth: false,
     initialization: false,
 }
 
 
-const appSlice = createSlice({
+const appSlice: Slice<InitialStateType> = createSlice({
     name: 'app',
     initialState,
     reducers: {
-        initializationAC(state, action: PayloadAction<boolean>) {
+        initializationAC(state: InitialStateType, action: PayloadAction<boolean>) {
             state.initialization = action.payload;
+        },
+        changeIsAuthAC(state: InitialStateType, action: PayloadAction<boolean>) {
+            state.isAuth = action.payload
         }
     },
 })
 
-export const initializeApp = () => async (dispatch: any) => {
+export const initializeApp = () => async (dispatch: AppDispatch) => {
 
     const response = await userAPI.detail()
     if (response.status === 200) {
-        dispatch(initializationAC(true))
+        dispatch(changeIsAuthAC(true))
     } else {
-        dispatch(initializationAC(false))
+        dispatch(changeIsAuthAC(false))
     }
+    dispatch(initializationAC(true))
 }
 
 
 export const appReducer = appSlice.reducer
 export const {
+    changeIsAuthAC,
     initializationAC
 } = appSlice.actions

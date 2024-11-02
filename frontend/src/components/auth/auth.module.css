@@ -26,6 +26,13 @@
     color: #dc3747;
 }
 
+.success {
+    margin-bottom: 0.3rem;
+    font-weight: bold;
+    text-align: center;
+    color: #45a049;
+}
+
 .link {
     text-decoration: none;
     color: #272822;

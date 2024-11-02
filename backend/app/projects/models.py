@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     from app.stories import Story
 
 
-class Project(Base):
+class Projects(Base):
     __tablename__ = 'project'
     title: Mapped[str] = mapped_column(String(69), nullable=False)
     user_id: Mapped[int] = mapped_column(ForeignKey('user.id', ondelete='CASCADE'), nullable=False)
@@ -25,7 +25,7 @@ class Project(Base):
     __table_args__ = (UniqueConstraint('title', 'user_id'),)
 
     def __str__(self):
-        return f'<Project {self.id}: {self.title}>'
+        return f'<Projects {self.id}: {self.title}>'
 
 
 class ProjectUsers(Base):
@@ -34,7 +34,7 @@ class ProjectUsers(Base):
     invited_id: Mapped[int] = mapped_column(ForeignKey('user.id', ondelete='CASCADE'))
     accepted: Mapped[bool] = mapped_column(Boolean, default=False)
 
-    project: Mapped['Project'] = relationship(back_populates='invitations')
+    project: Mapped['Projects'] = relationship(back_populates='invitations')
     invited_user: Mapped['User'] = relationship(back_populates='invitations')
 
     __table_args__ = (UniqueConstraint('project_id', 'invited_id'),)

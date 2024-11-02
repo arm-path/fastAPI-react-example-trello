@@ -1,21 +1,21 @@
 import React, {useEffect} from 'react'
 import {NavLink} from 'react-router-dom'
 
-import classes from './authentication.module.css'
+import classes from './auth.module.css'
 import Input from '../form/input/Input.tsx'
 import {
-    authenticationThunk,
+    authThunk,
     changeEmailFormAC,
     changePasswordFormAC,
     checkEmailFormAC,
     clearFormAC
-} from '../../redux/reducers/authenticationReducer.ts'
+} from '../../redux/reducers/authReducer.ts'
 import Button from '../form/button/Button.tsx'
 import {useAppDispatch, useAppSelector} from '../../redux/hooks.ts'
 
 
-const Authentication = () => {
-    const form = useAppSelector(state => state.authentication.form)
+const Login = () => {
+    const form = useAppSelector(state => state.auth.form)
     const dispatch = useAppDispatch()
 
     useEffect(() => {
@@ -27,6 +27,7 @@ const Authentication = () => {
             <div className={classes.formContainer}>
                 <h2 className={classes.formTitle}>Авторизация</h2>
                 <div className={classes.error}>{form.error}</div>
+                <div className={classes.success}>{form.success}</div>
                 <Input type='text'
                        placeholder={form.email.title}
                        value={form.email.value}
@@ -41,12 +42,12 @@ const Authentication = () => {
                        onchangeHandler={(e: React.ChangeEvent<HTMLInputElement>) => dispatch(changePasswordFormAC(e.target.value))}
                 />
                 <div className={classes.formTitle}>
-                    <NavLink className={classes.link} to='/registration'>Регистрация</NavLink>
+                    <NavLink className={classes.link} to='/register'>Регистрация</NavLink>
                 </div>
                 <Button type='button'
                         title='Авторизация'
                         style='success'
-                        onClickHandler={() => dispatch(authenticationThunk())}
+                        onClickHandler={() => dispatch(authThunk())}
                 />
 
             </div>
@@ -54,4 +55,4 @@ const Authentication = () => {
     )
 }
 
-export default Authentication
+export default Login

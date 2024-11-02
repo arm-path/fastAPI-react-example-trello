@@ -5,7 +5,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.database import Base
 
 if TYPE_CHECKING:
-    from app.projects import Project
+    from app.projects import Projects
     from app.tasks import Task
 
 class Dashboard(Base):
@@ -15,7 +15,7 @@ class Dashboard(Base):
     color: Mapped[str] = mapped_column(String(69), default='#b1b4b9')
     index: Mapped[int] = mapped_column(Integer, default=0)
 
-    project: Mapped['Project'] = relationship(back_populates='dashboards')
+    project: Mapped['Projects'] = relationship(back_populates='dashboards')
     tasks: Mapped[List['Task']] = relationship(back_populates='dashboard')
 
     def __str__(self):

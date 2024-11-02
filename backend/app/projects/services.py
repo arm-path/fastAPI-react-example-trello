@@ -5,14 +5,14 @@ from sqlalchemy.orm import selectinload, defer
 
 from app.database import DatabaseService
 from app.exceptions import ObjectNotFoundException
-from app.projects import Project, ProjectUsers
+from app.projects import Projects, ProjectUsers
 from app.projects.schemas import CreateProjectSchema, UpdateProjectSchema
 from app.authentication.schemas import UserRead
 from app.users.services import UserService
 
 
 class ProjectService(DatabaseService):
-    model = Project
+    model = Projects
 
     @classmethod
     async def create_project(cls, session: AsyncSession, user: UserRead, data: CreateProjectSchema):
@@ -35,8 +35,8 @@ class ProjectService(DatabaseService):
     async def get_projects(cls, session: AsyncSession, user: UserRead):
         my_projects = await cls.get_list(session, {'user_id': user.id})
         query: Select = (
-            select(Project)
-            .join(Project.invitations)
+            select(Projects)
+            .join(Projects.invitations)
             .filter(ProjectUsers.invited_id == user.id, ProjectUsers.accepted == True)
         )
         results: Result[tuple[cls.model]] = await session.execute(query)
@@ -46,12 +46,12 @@ class ProjectService(DatabaseService):
     @classmethod
     async def get_project(cls, session: AsyncSession, user: UserRead, project_id: int):
         query: Select = (
-            select(Project)
-            .outerjoin(Project.invitations)
-            .filter(Project.id == project_id,
+            select(Projects)
+            .outerjoin(Projects.invitations)
+            .filter(Projects.id == project_id,
                     or_(
                         and_(ProjectUsers.invited_id == user.id, ProjectUsers.accepted == True),
-                        Project.user_id == user.id
+                        Projects.user_id == user.id
                     ))
             .options(
                 selectinload(cls.model.user),
@@ -59,10 +59,10 @@ class ProjectService(DatabaseService):
                 defer(cls.model.user_id)
             )
         )
-        result: Result[tuple[Project]] = await session.execute(query)
+        result: Result[tuple[Projects]] = await session.execute(query)
         project = result.scalar_one_or_none()
         if not project:
-            raise ObjectNotFoundException('Project')
+            raise ObjectNotFoundException('Projects')
         return project
 
 
@@ -78,7 +78,7 @@ class ProjectUsersService(DatabaseService):
         filters = {'id': project_id, 'user_id': user.id}
         project = await ProjectService.get_detail(session, filters)
         if not project:
-            raise ObjectNotFoundException('Project')
+            raise ObjectNotFoundException('Projects')
         values = {'project_id': project.id, 'invited_id': invite_user.id}
         options = [selectinload(cls.model.invited_user)]
         return await cls.create(session, values, options)

@@ -6,7 +6,7 @@ from app.authentication.schemas import UserRead, UserCreate
 
 router = APIRouter(
     prefix='/auth',
-    tags=['Authentication']
+    tags=['Login']
 )
 
 router.include_router(

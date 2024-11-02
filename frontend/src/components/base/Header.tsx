@@ -2,11 +2,20 @@ import {NavLink} from 'react-router-dom'
 import classes from './header.module.css'
 
 
-const Header = (props) => {
+const Header = () => {
     return (
         <div className={classes.container}>
-            <NavLink className={({ isActive, isPending }) =>
-                isActive ? classes.linkAct : classes.link} to='/authentication'>Вход</NavLink>
+            <div className={classes.containerLink}>
+                <NavLink className={({ isActive}) =>
+                    isActive ? classes.linkAct : classes.link} to='/projects'>Проекты
+                </NavLink>
+            </div>
+            <div>
+                <NavLink className={({ isActive}) =>
+                    isActive ? classes.linkAct : classes.link} to='/login'>Вход
+                </NavLink>
+            </div>
+
         </div>
     )
 }

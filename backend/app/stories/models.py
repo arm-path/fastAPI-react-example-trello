@@ -8,7 +8,7 @@ from app.database import Base
 
 
 if TYPE_CHECKING:
-    from app.projects import Project
+    from app.projects import Projects
     from app.users import User
 
 
@@ -20,7 +20,7 @@ class Story(Base):
     created: Mapped[datetime] = mapped_column(DateTime, server_default=text("TIMEZONE('utc', now())"))
     description: Mapped[str] = mapped_column(String(255), default='')
 
-    project: Mapped['Project'] = relationship(back_populates='stories')
+    project: Mapped['Projects'] = relationship(back_populates='stories')
     user: Mapped['User'] = relationship(back_populates='stories')
 
     def __str__(self):

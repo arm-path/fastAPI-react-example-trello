@@ -10,7 +10,7 @@ from alembic import context
 from app.database import Base
 from app.settings import settings
 from app.users import User
-from app.projects import Project
+from app.projects import Projects
 from app.projects import ProjectUsers
 from app.dashboards import Dashboard
 from app.tasks import Task, ResponsibleTask

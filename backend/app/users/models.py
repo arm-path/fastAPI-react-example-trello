@@ -9,7 +9,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.database.settings import Base, db_settings
 
 if TYPE_CHECKING:
-    from app.projects import Project
+    from app.projects import Projects
     from app.projects import ProjectUsers
     from app.tasks import Task
     from app.stories import Story
@@ -26,8 +26,8 @@ class User(Base):
     first_name: Mapped[str | None] = mapped_column(String(69), nullable=True)
     last_name: Mapped[str | None] = mapped_column(String(69), nullable=True)
 
-    projects: Mapped[List['Project']] = relationship(back_populates='user')
-    invited_projects: Mapped[List['Project']] = relationship(secondary='project_users', back_populates='invited_users')
+    projects: Mapped[List['Projects']] = relationship(back_populates='user')
+    invited_projects: Mapped[List['Projects']] = relationship(secondary='project_users', back_populates='invited_users')
     invitations: Mapped[List['ProjectUsers']] = relationship(back_populates='invited_user')
     responsible_tasks: Mapped[List['Task']] = relationship(secondary='responsible_task',
                                                            back_populates='responsible_users')

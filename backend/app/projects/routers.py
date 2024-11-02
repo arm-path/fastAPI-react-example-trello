@@ -16,7 +16,7 @@ from app.authentication.schemas import UserRead
 
 router = APIRouter(
     prefix='/project',
-    tags=['Project']
+    tags=['Projects']
 )
 
 
