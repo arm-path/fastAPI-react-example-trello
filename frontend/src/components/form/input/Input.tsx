@@ -6,16 +6,19 @@ type InputPropsType = {
     placeholder: string,
     value: string,
     error: string,
-    onchangeHandler: (e: React.ChangeEvent<HTMLInputElement>) => void
+    styles?: string,
+    containerStyles?: string,
+    onchangeHandler?: (e: React.ChangeEvent<HTMLInputElement>) => void
     onBlurHandler?: () => void
 
 }
 
-const Input = ({type, placeholder, value, error, onchangeHandler, onBlurHandler}: InputPropsType) => {
+const Input = (props: InputPropsType) => {
+    const {type, placeholder, value, error, styles, containerStyles, onchangeHandler, onBlurHandler} = props
     return (
-        <div>
+        <div className={containerStyles}>
             <span className={classes.msgError}>{error}</span>
-            <input className={classes.text}
+            <input className={classes.text + ' ' + styles}
                    type={type}
                    placeholder={placeholder}
                    value={value}

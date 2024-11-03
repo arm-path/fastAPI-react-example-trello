@@ -17,6 +17,13 @@ export type UserType = {
     is_verified: boolean
 }
 
+export type BaseUserType = {
+    id: number,
+    email: string,
+    first_name: string | null,
+    last_name: string | null,
+}
+
 
 const userAPI = {
     async detail() {
