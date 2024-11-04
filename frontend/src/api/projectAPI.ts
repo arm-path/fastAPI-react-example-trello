@@ -2,7 +2,7 @@ import axios, {AxiosResponse} from 'axios'
 import Cookies from 'js-cookie'
 
 import {BaseUserType} from './userAPI'
-import {APIAuthErrorType, APIValidationErrorType} from './api.ts'
+import {APIAuthErrorType, APIBaseErrorType, APIValidationErrorType} from './api.ts'
 
 
 const instance = axios.create({
@@ -39,7 +39,7 @@ export type ProjectDetailType = {
 
 }
 
-export type CreateResponseType = ProjectType | APIValidationErrorType | APIAuthErrorType
+export type CreateResponseType = ProjectType | APIValidationErrorType | APIAuthErrorType | APIBaseErrorType
 export type UpdateErrorResponseType = APIValidationErrorType | APIAuthErrorType
 export type UpdateResponseType = ProjectType | APIValidationErrorType | APIAuthErrorType
 

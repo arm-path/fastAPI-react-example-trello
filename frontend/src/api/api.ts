@@ -8,5 +8,13 @@ export type APIValidationErrorType = {
 }
 
 export type APIAuthErrorType = {
-    detail: string
+    detail: {}
+}
+
+type BaseErrorType = {
+    msg: string,
+}
+
+export type APIBaseErrorType = {
+    detail: BaseErrorType
 }
