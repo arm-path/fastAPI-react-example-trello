@@ -41,7 +41,7 @@ export type ProjectDetailType = {
 
 export type CreateResponseType = ProjectType | APIValidationErrorType | APIAuthErrorType | APIBaseErrorType
 export type UpdateErrorResponseType = APIValidationErrorType | APIAuthErrorType
-export type UpdateResponseType = ProjectType | APIValidationErrorType | APIAuthErrorType
+export type UpdateResponseType = ProjectType | APIValidationErrorType | APIAuthErrorType | APIBaseErrorType
 
 const projectAPI = {
     headers: {'Authorization': 'Bearer ' + Cookies.get('access_token')},

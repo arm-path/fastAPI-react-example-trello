@@ -76,6 +76,16 @@
     opacity: 0.8;
 }
 
+.saveLoadingImg {
+    width: 25px;
+    margin-left: -30px;
+    margin-top: 9px;
+}
+
+.saveLoadingImg:hover {
+    cursor: wait;
+}
+
 .error {
     margin-bottom: 0.3rem;
     font-weight: bold;
