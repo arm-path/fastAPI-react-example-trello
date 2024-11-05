@@ -1,7 +1,7 @@
 import {useParams} from 'react-router-dom'
-import {useEffect} from 'react'
+import React, {useEffect} from 'react'
 import classes from './DetailProject.module.css'
-import {getDashboards} from '../../../redux/reducers/dashboardReducer.ts'
+import {getDashboards, setEditDashboardAC} from '../../../redux/reducers/dashboardReducer.ts'
 import {useAppDispatch, useAppSelector} from '../../../redux/hooks.ts'
 import Dashboard from './dashboard/Dashboard.tsx'
 import Input from '../../form/input/Input.tsx'
@@ -17,7 +17,23 @@ const DetailProject = () => {
     const project = useAppSelector(state => state.projects.detail)
     const projectLoading = useAppSelector(state => state.projects.loading)
     const dashboards = useAppSelector(state => state.dashboard.list)
+    const dashboardEdit = useAppSelector(state => state.dashboard.editDashboard)
 
+    const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
+        const target = event.target as HTMLElement;
+        if (!(target instanceof HTMLInputElement)) {
+            if (dashboardEdit.id){
+                if (dashboardEdit.title != dashboardEdit.oldTitle){
+                    //     TODO: UpdateThunk
+                    dispatch(setEditDashboardAC(null));
+                }else{
+                    dispatch(setEditDashboardAC(null));
+                }
+
+            }
+
+        }
+    }
 
     useEffect(() => {
         dispatch(getDashboards(Number(params.projectID)))
@@ -30,7 +46,7 @@ const DetailProject = () => {
                 ? <div className={classes.loaderCenter}><Loader/></div>
                 : <>
                     {!project ? <NotFound/>
-                        : <div className={classes.container}>
+                        : <div className={classes.container} onClick={handleClick}>
                             <h3 className={classes.title}>Панели задач <br/> ( {project.title} ) </h3>
                             <div className={classes.dashboards}>
                                 <div className={classes.dashboardCreate}>
