@@ -1,5 +1,5 @@
 import {NavLink} from 'react-router-dom'
-import React, {ChangeEvent} from 'react'
+import {ChangeEvent} from 'react'
 
 import classes from './project.module.css'
 import editIcon from '../../assets/images/edit.png'

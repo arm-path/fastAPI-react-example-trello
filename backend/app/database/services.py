@@ -2,7 +2,7 @@ from typing import List
 
 from asyncpg import UniqueViolationError, ForeignKeyViolationError, UndefinedFunctionError
 from fastapi_pagination.ext.sqlalchemy import paginate
-from sqlalchemy import Select, select, Result, Insert, insert, Update, update, delete, Delete, func
+from sqlalchemy import Select, select, Result, Insert, insert, Update, update, delete, Delete, func, asc, desc
 from sqlalchemy.exc import IntegrityError, InvalidRequestError, ProgrammingError, MultipleResultsFound
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -14,12 +14,24 @@ class DatabaseService:
     model = None
 
     @classmethod
-    async def get_list(cls, session: AsyncSession, filters, options: List = [], paginated: bool = False):
+    async def get_list(cls, session: AsyncSession,
+                       filters,
+                       options: List = [],
+                       paginated: bool = False,
+                       order_by: str = None,
+                       ascending: bool = True):
         query: Select = (
             select(cls.model)
             .filter_by(**filters)
             .options(*options)
         )
+
+        if order_by:
+            if ascending:
+                query = query.order_by(asc(order_by))
+            else:
+                query = query.order_by(desc(order_by))
+
         if paginated:
             return await paginate(session, query)
         result: Result[tuple[cls.model]] = await session.execute(query)

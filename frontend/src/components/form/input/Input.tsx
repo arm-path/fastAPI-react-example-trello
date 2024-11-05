@@ -5,7 +5,7 @@ type InputPropsType = {
     type?: string,
     placeholder: string,
     value: string,
-    error: string,
+    error?: string,
     styles?: string,
     containerStyles?: string,
     onchangeHandler?: (e: React.ChangeEvent<HTMLInputElement>) => void

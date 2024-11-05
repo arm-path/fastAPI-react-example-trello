@@ -64,7 +64,7 @@ class DashboardService(DatabaseService):
                              project_id: int) -> List[DashboardReadSchema]:
         await cls.check_project(session, user, project_id)
         filters = {'project_id': project_id}
-        return await cls.get_list(session, filters, [selectinload(cls.model.tasks)])
+        return await cls.get_list(session, filters, [selectinload(cls.model.tasks)], order_by='index')
 
     @classmethod
     async def get_dashboard(cls, session: AsyncSession,
@@ -131,5 +131,3 @@ class DashboardService(DatabaseService):
         await session.commit()
 
         return await cls.get_dashboard(session, user, project_id, dashboard_id)
-
-

@@ -80,6 +80,14 @@ export const updateProjectThunk = createAsyncThunk<AxiosResponse<UpdateResponseT
     }
 )
 
+export const getProjectThunk = createAsyncThunk<AxiosResponse<ProjectDetailType>, number>
+(
+    'project/detail',
+    async (projectID: number) => {
+        return await ProjectAPI.detail(projectID)
+    }
+)
+
 const projectSlice = createSlice({
     name: 'project',
     initialState,
@@ -100,7 +108,7 @@ const projectSlice = createSlice({
         },
         changeTitleUpdateProjectAC(state, action: PayloadAction<string>) {
             state.updateForm.title = action.payload
-        }
+        },
     },
     extraReducers: (builder) => {
         builder
@@ -160,13 +168,22 @@ const projectSlice = createSlice({
 
                 state.updateForm.loading = false
             })
+            .addCase(getProjectThunk.pending, (state) => {
+                state.loading = true
+            })
+            .addCase(getProjectThunk.fulfilled, (state, action) => {
+                if (action.payload.status === 200) {
+                    state.detail = action.payload.data
+                }
+                state.loading = false
+            })
     }
 })
 
 export const {
     changeTitleCreateProjectAC,
     changeTitleUpdateProjectAC,
-    setEditFormAC
+    setEditFormAC,
 } = projectSlice.actions
 
 const projectReducer = projectSlice.reducer
