@@ -50,3 +50,12 @@
     align-items: center;
     z-index: 9999;
 }
+
+.error{
+    padding: 10px;
+    color: #f9f9f9;
+    text-align: center;
+    font-style: italic;
+    font-weight: bold;
+    background-color: #dc3747;
+}

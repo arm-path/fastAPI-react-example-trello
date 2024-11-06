@@ -11,7 +11,7 @@ type InitialState = {
         title: string,
         oldTitle: string,
         error: string,
-        loading: false
+        loading: boolean
     }
 }
 
@@ -34,6 +34,20 @@ export const getDashboards = createAsyncThunk<AxiosResponse<Array<DashboardListT
     }
 )
 
+export const updateDashboard = createAsyncThunk<AxiosResponse<DashboardListType> | undefined, void, ThunkApiConfig>
+(
+    'dashboard/update',
+    async (_, thunkAPI) => {
+        const projectID = thunkAPI.getState().projects.detail?.id
+        if (!projectID) return undefined
+        const editDashboard = thunkAPI.getState().dashboard.editDashboard
+        if (!editDashboard.id) return undefined
+        if (!editDashboard.title) return undefined
+        if (editDashboard.title === editDashboard.oldTitle) return undefined
+        return await DashboardAPI.update(projectID, editDashboard.id, editDashboard.title)
+    }
+)
+
 
 const dashboardSlice = createSlice({
     name: 'dashboardSlice',
@@ -45,24 +59,47 @@ const dashboardSlice = createSlice({
             if (dashboard) {
                 state.editDashboard.title = dashboard.title
                 state.editDashboard.oldTitle = dashboard.title
+                state.editDashboard.error = ''
             } else {
                 state.editDashboard.id = null
+                state.editDashboard.error = ''
             }
         },
         changeEditDashboardAC(state, action: PayloadAction<string>) {
 
             state.editDashboard.title = action.payload
+            state.editDashboard.error = ''
         }
     },
     extraReducers: (builder) => {
         builder
             .addCase(getDashboards.fulfilled, (state, action) => {
-
                 if (action.payload) {
                     if (action.payload.status === 200) {
                         state.list = action.payload.data
                     }
                 }
+            })
+            .addCase(updateDashboard.pending, (state) => {
+                state.editDashboard.loading = true
+            })
+            .addCase(updateDashboard.fulfilled, (state, action) => {
+                if (action.payload) {
+                    if (action.payload.status === 200 && 'id' in action.payload.data) {
+                        // @ts-ignore
+                        const dashboard = state.list.find(el => el.id === action.payload.data.id)
+                        if (dashboard) {
+                            dashboard.title = action.payload.data.title
+                        } else {
+                            state.editDashboard.error = 'Не удалось изменить название'
+                        }
+                    } else {
+                        state.editDashboard.error = 'Не удалось изменить название'
+                    }
+                } else {
+                    state.editDashboard.error = 'Не удалось изменить название'
+                }
+                state.editDashboard.loading = false
             })
     }
 })

@@ -33,8 +33,16 @@ export type DashboardListType = DashboardType & {
 const dashboardAPI = {
     headers: {'Authorization': 'Bearer ' + Cookies.get('access_token')},
     async list(projectID: number): Promise<AxiosResponse> {
-        return await instance.get<AxiosResponse<DashboardListType>>(`${projectID}/list/`, {headers: this.headers})
+        return await instance.get<AxiosResponse<Array<DashboardListType>>>(`${projectID}/list/`, {headers: this.headers})
             .then((response) => response)
+            .catch(error => error)
+    },
+    async update(projectID: number, dashboardID: number, title: string): Promise<AxiosResponse> {
+        return await instance.put<AxiosResponse<DashboardListType>>(`${projectID}/update/${dashboardID}/`, {
+            title: title,
+            color: ''
+        }, {headers: this.headers})
+            .then(response => response)
             .catch(error => error)
     }
 }

@@ -1,7 +1,7 @@
 import {useParams} from 'react-router-dom'
 import React, {useEffect} from 'react'
 import classes from './DetailProject.module.css'
-import {getDashboards, setEditDashboardAC} from '../../../redux/reducers/dashboardReducer.ts'
+import {getDashboards, setEditDashboardAC, updateDashboard} from '../../../redux/reducers/dashboardReducer.ts'
 import {useAppDispatch, useAppSelector} from '../../../redux/hooks.ts'
 import Dashboard from './dashboard/Dashboard.tsx'
 import Input from '../../form/input/Input.tsx'
@@ -22,11 +22,11 @@ const DetailProject = () => {
     const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
         const target = event.target as HTMLElement;
         if (!(target instanceof HTMLInputElement)) {
-            if (dashboardEdit.id){
-                if (dashboardEdit.title != dashboardEdit.oldTitle){
-                    //     TODO: UpdateThunk
+            if (dashboardEdit.id) {
+                if (dashboardEdit.title != dashboardEdit.oldTitle) {
+                    dispatch(updateDashboard())
                     dispatch(setEditDashboardAC(null));
-                }else{
+                } else {
                     dispatch(setEditDashboardAC(null));
                 }
 
@@ -46,8 +46,10 @@ const DetailProject = () => {
                 ? <div className={classes.loaderCenter}><Loader/></div>
                 : <>
                     {!project ? <NotFound/>
-                        : <div className={classes.container} onClick={handleClick}>
+                        : <div className={classes.container} onClick={handleClick}
+                               style={{cursor: dashboardEdit.loading ? 'wait' : 'default'}}>
                             <h3 className={classes.title}>Панели задач <br/> ( {project.title} ) </h3>
+                            <div className={dashboardEdit.error && classes.error}>{dashboardEdit.error}</div>
                             <div className={classes.dashboards}>
                                 <div className={classes.dashboardCreate}>
                                     <h4 className={classes.createTitle}>Создать панель</h4>
@@ -57,6 +59,7 @@ const DetailProject = () => {
                                                 onClickHandler={() => console.log()}/>
                                     </div>
                                 </div>
+
                                 {dashboards.map(el => <Dashboard key={el.id} data={el}/>)}
                             </div>
                         </div>
