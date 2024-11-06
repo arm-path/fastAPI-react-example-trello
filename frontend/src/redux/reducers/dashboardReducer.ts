@@ -6,23 +6,31 @@ import {ThunkApiConfig} from '../store.ts';
 
 type InitialState = {
     list: Array<DashboardListType>
+    error: string
     editDashboard: {
         id: number | null,
         title: string,
         oldTitle: string,
-        error: string,
         loading: boolean
+    },
+    formDashboard: {
+        title: string,
+        loading: boolean,
     }
 }
 
 const initialState: InitialState = {
     list: [],
+    error: '',
     editDashboard: {
         id: null,
         title: '',
         oldTitle: '',
-        error: '',
         loading: false
+    },
+    formDashboard: {
+        title: '',
+        loading: false,
     }
 }
 
@@ -48,6 +56,19 @@ export const updateDashboard = createAsyncThunk<AxiosResponse<DashboardListType>
     }
 )
 
+export const createDashboard = createAsyncThunk<AxiosResponse<Array<DashboardListType>> | undefined, void, ThunkApiConfig>
+(
+    'dashboard/create',
+    async (_, thunkAPI) => {
+        const projectID = thunkAPI.getState().projects.detail?.id
+        if (!projectID) return undefined
+        const title = thunkAPI.getState().dashboard.formDashboard.title
+        if (title.trim().length === 0) return undefined
+        return await DashboardAPI.create(projectID, title)
+
+    }
+)
+
 
 const dashboardSlice = createSlice({
     name: 'dashboardSlice',
@@ -59,16 +80,20 @@ const dashboardSlice = createSlice({
             if (dashboard) {
                 state.editDashboard.title = dashboard.title
                 state.editDashboard.oldTitle = dashboard.title
-                state.editDashboard.error = ''
+                state.error = ''
             } else {
                 state.editDashboard.id = null
-                state.editDashboard.error = ''
+                state.error = ''
             }
         },
         changeEditDashboardAC(state, action: PayloadAction<string>) {
 
             state.editDashboard.title = action.payload
-            state.editDashboard.error = ''
+            state.error = ''
+        },
+        changeTitleCreateDashboard(state, action: PayloadAction<string>) {
+            state.formDashboard.title = action.payload
+            state.error = ''
         }
     },
     extraReducers: (builder) => {
@@ -91,15 +116,32 @@ const dashboardSlice = createSlice({
                         if (dashboard) {
                             dashboard.title = action.payload.data.title
                         } else {
-                            state.editDashboard.error = 'Не удалось изменить название'
+                            state.error = 'Не удалось изменить название'
                         }
                     } else {
-                        state.editDashboard.error = 'Не удалось изменить название'
+                        state.error = 'Не удалось изменить название'
                     }
                 } else {
-                    state.editDashboard.error = 'Не удалось изменить название'
+                    state.error = 'Не удалось изменить название'
                 }
                 state.editDashboard.loading = false
+            })
+            .addCase(createDashboard.pending, (state) => {
+                state.formDashboard.loading = true
+            })
+            .addCase(createDashboard.fulfilled, (state, action) => {
+                if (action.payload) {
+                    if (action.payload.status === 200) {
+                        state.list = action.payload.data
+                        state.formDashboard.title = ''
+                        state.error = ''
+                    } else {
+                        state.error = 'Не удалось создать панель'
+                    }
+                } else {
+                    state.error = 'Не удалось создать панель'
+                }
+                state.formDashboard.loading = false
             })
     }
 })
@@ -108,5 +150,6 @@ export default dashboardSlice.reducer
 
 export const {
     setEditDashboardAC,
-    changeEditDashboardAC
+    changeEditDashboardAC,
+    changeTitleCreateDashboard
 } = dashboardSlice.actions

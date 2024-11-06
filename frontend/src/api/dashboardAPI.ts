@@ -44,6 +44,14 @@ const dashboardAPI = {
         }, {headers: this.headers})
             .then(response => response)
             .catch(error => error)
+    },
+    async create(projectID: number, title: string): Promise<AxiosResponse> {
+        return await instance.post<AxiosResponse<DashboardListType>>(`${projectID}/create/`, {
+            title: title,
+            color: ''
+        }, {headers: this.headers})
+            .then(response => response)
+            .catch(error => error)
     }
 }
 

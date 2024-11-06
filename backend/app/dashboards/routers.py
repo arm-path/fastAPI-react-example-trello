@@ -16,7 +16,7 @@ router = APIRouter(
 )
 
 
-@router.post('/{project_id}/create/', response_model=DashboardReadSchema)
+@router.post('/{project_id}/create/', response_model=List[DashboardReadSchema])
 async def create_dashboard(session: Annotated[AsyncSession, Depends(db_settings.get_session)],
                            user: Annotated[UserRead, Depends(current_user)],
                            project_id: int,
@@ -33,7 +33,7 @@ async def update_dashboard(session: Annotated[AsyncSession, Depends(db_settings.
     return await DashboardService.update_dashboard(session, user, project_id, dashboard_id, data)
 
 
-@router.put('/{project_id}/moving/{dashboard_id}')
+@router.put('/{project_id}/moving/{dashboard_id}', response_model=List[DashboardReadSchema])
 async def moving_dashboard(session: Annotated[AsyncSession, Depends(db_settings.get_session)],
                            user: Annotated[UserRead, Depends(current_user)],
                            project_id: int,

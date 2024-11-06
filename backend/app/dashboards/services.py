@@ -130,4 +130,4 @@ class DashboardService(DatabaseService):
 
         await session.commit()
 
-        return await cls.get_dashboard(session, user, project_id, dashboard_id)
+        return await cls.get_dashboards(session, user, project_id)
