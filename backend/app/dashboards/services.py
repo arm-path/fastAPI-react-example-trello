@@ -53,10 +53,17 @@ class DashboardService(DatabaseService):
         return await cls.update(session, filters, values, [selectinload(cls.model.tasks)])
 
     @classmethod
-    async def delete_dashboard(cls, session: AsyncSession, user: UserRead, project_id: int, dashboard_id: int) -> None:
+    async def delete_dashboard(cls, session: AsyncSession, user: UserRead, project_id: int, dashboard_id: int):
         await cls.check_project(session, user, project_id)
         filters = {'id': dashboard_id}
+        total_dashboards = await session.execute(
+            select(func.count()).where(cls.model.project_id == project_id)
+        )
+        total_count = total_dashboards.scalar()
+
+        await cls.moving_dashboard(session, user, project_id, dashboard_id, total_count - 1)
         await cls.delete(session, filters)
+        return await cls.get_dashboards(session, user, project_id)
 
     @classmethod
     async def get_dashboards(cls, session: AsyncSession,

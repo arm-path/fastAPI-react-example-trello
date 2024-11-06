@@ -42,7 +42,7 @@ async def moving_dashboard(session: Annotated[AsyncSession, Depends(db_settings.
     return await DashboardService.moving_dashboard(session, user, project_id, dashboard_id, data.index)
 
 
-@router.delete('/{project_id}/delete/{dashboard_id}/', status_code=status.HTTP_204_NO_CONTENT)
+@router.delete('/{project_id}/delete/{dashboard_id}/', response_model=List[DashboardReadSchema])
 async def delete_dashboard(session: Annotated[AsyncSession, Depends(db_settings.get_session)],
                            user: Annotated[UserRead, Depends(current_user)],
                            project_id: int,
