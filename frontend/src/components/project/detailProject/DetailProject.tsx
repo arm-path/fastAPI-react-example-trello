@@ -26,6 +26,7 @@ const DetailProject = () => {
     const dashboardEdit = useAppSelector(state => state.dashboard.editDashboard)
     const error = useAppSelector(state => state.dashboard.error)
     const createFormDashboard = useAppSelector(state => state.dashboard.formDashboard)
+    const movingLoading = useAppSelector(state => state.dashboard.moving.loading)
     const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
         const target = event.target as HTMLElement;
         if (!(target instanceof HTMLInputElement)) {
@@ -54,7 +55,7 @@ const DetailProject = () => {
                 : <>
                     {!project ? <NotFound/>
                         : <div className={classes.container} onClick={handleClick}
-                               style={{cursor: dashboardEdit.loading ? 'wait' : 'default'}}>
+                               style={{cursor: dashboardEdit.loading || movingLoading ? 'wait' : 'default'}}>
                             <h3 className={classes.title}>Панели задач <br/> ( {project.title} ) </h3>
                             <div className={error && classes.error}>{error}</div>
                             <div className={classes.dashboards}>

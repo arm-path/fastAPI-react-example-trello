@@ -16,7 +16,12 @@ type InitialState = {
     formDashboard: {
         title: string,
         loading: boolean,
-    }
+    },
+    moving: {
+        id: number | null,
+        loading: boolean
+    },
+
 }
 
 const initialState: InitialState = {
@@ -31,7 +36,12 @@ const initialState: InitialState = {
     formDashboard: {
         title: '',
         loading: false,
-    }
+    },
+    moving: {
+        id: null,
+        loading: false
+    },
+
 }
 
 export const getDashboards = createAsyncThunk<AxiosResponse<Array<DashboardListType>> | undefined, number, ThunkApiConfig>
@@ -70,6 +80,20 @@ export const createDashboard = createAsyncThunk<AxiosResponse<Array<DashboardLis
 )
 
 
+export const movingDashboard = createAsyncThunk<AxiosResponse<Array<DashboardListType>> | undefined, number, ThunkApiConfig>
+(
+    'dashboard/moving',
+    async (index: number, thunkAPI) => {
+        const projectID = thunkAPI.getState().projects.detail?.id
+        const dashboardID = thunkAPI.getState().dashboard.moving?.id
+        if (!projectID) return undefined
+        if (!dashboardID) return undefined
+        return await DashboardAPI.moving(projectID, dashboardID, index)
+
+    }
+)
+
+
 const dashboardSlice = createSlice({
     name: 'dashboardSlice',
     initialState,
@@ -93,6 +117,10 @@ const dashboardSlice = createSlice({
         },
         changeTitleCreateDashboard(state, action: PayloadAction<string>) {
             state.formDashboard.title = action.payload
+            state.error = ''
+        },
+        editMovingElement(state, action: PayloadAction<number>) {
+            state.moving.id = action.payload
             state.error = ''
         }
     },
@@ -143,6 +171,22 @@ const dashboardSlice = createSlice({
                 }
                 state.formDashboard.loading = false
             })
+            .addCase(movingDashboard.pending, (state) => {
+                state.moving.loading = true
+            })
+            .addCase(movingDashboard.fulfilled, (state, action) => {
+                if (action.payload) {
+                    if (action.payload.status === 200) {
+                        state.list = action.payload.data
+                    } else {
+                        state.error = 'Не удалось переместить панель'
+                    }
+                } else {
+                    state.error = 'Не удалось переместить панель'
+                }
+                state.moving.id = null
+                state.moving.loading = false
+            })
     }
 })
 
@@ -151,5 +195,6 @@ export default dashboardSlice.reducer
 export const {
     setEditDashboardAC,
     changeEditDashboardAC,
-    changeTitleCreateDashboard
+    changeTitleCreateDashboard,
+    editMovingElement
 } = dashboardSlice.actions

@@ -52,6 +52,11 @@ const dashboardAPI = {
         }, {headers: this.headers})
             .then(response => response)
             .catch(error => error)
+    },
+    async moving(projectID: number, dashboardID: number, index: number): Promise<AxiosResponse> {
+        return await instance.put<AxiosResponse<Array<DashboardListType>>>(`${projectID}/moving/${dashboardID}/`, {index}, {headers: this.headers})
+            .then(response => response)
+            .catch(error => error)
     }
 }
 

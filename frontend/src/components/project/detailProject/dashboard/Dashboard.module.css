@@ -6,6 +6,7 @@
     padding: 15px;
     width: calc(33% - 20px);
     transition: transform 0.2s;
+    cursor: grab;
 }
 
 .container:hover {
