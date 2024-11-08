@@ -9,6 +9,8 @@ import {
     setEditDashboardAC
 } from '../../../../redux/reducers/dashboardReducer'
 import {useAppDispatch, useAppSelector} from '../../../../redux/hooks'
+import Task from './task/Task.tsx';
+import CreateTask from './task/CreateTask.tsx';
 
 
 type DashboardProps = {
@@ -29,7 +31,7 @@ const Dashboard = (props: DashboardProps) => {
     }
     const onDragDropHandler = (e: DragEvent<HTMLDivElement>, el: DashboardListType) => {
         e.preventDefault()
-        dispatch(movingDashboard( el.index))
+        dispatch(movingDashboard(el.index))
         return undefined
     }
 
@@ -85,6 +87,10 @@ const Dashboard = (props: DashboardProps) => {
             </div>
 
             <hr className={edit ? classes.hide : ''}/>
+
+            {data.tasks.map(el => <Task key={el.id} data={el}/>)}
+            <hr/>
+            <CreateTask dashboardID={data.id}/>
         </div>
     )
 }

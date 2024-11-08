@@ -16,7 +16,7 @@ type DashboardType = {
     project_id: number,
 }
 
-type TaskType = {
+export type TaskType = {
     id: number,
     title: string,
     deadline: string,

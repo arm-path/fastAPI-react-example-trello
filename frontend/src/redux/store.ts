@@ -4,13 +4,15 @@ import {authReducer} from './reducers/authReducer.ts'
 import {appReducer} from './reducers/appReducer'
 import projectReducer from './reducers/projectReducer.ts'
 import dashboardReducer from './reducers/dashboardReducer.ts'
+import taskReducer from './reducers/taskReducer.ts'
 
 
 const rootReducer = combineReducers({
     app: appReducer,
     auth: authReducer,
     projects: projectReducer,
-    dashboard: dashboardReducer
+    dashboard: dashboardReducer,
+    tasks: taskReducer,
 })
 
 export const store = configureStore(
