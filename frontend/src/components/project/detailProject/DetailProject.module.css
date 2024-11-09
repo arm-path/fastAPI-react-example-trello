@@ -15,25 +15,6 @@
     padding: 20px;
 }
 
-.dashboardCreate {
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    margin: 10px;
-    padding: 15px;
-    width: calc(33% - 20px);
-    transition: transform 0.2s;
-}
-
-.dashboardCreate:hover {
-    transform: translateY(-5px);
-}
-
-.createTitle {
-    text-align: center;
-    letter-spacing: 3px;
-}
-
 .btnCenter {
     text-align: center;
 }

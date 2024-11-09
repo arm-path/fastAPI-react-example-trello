@@ -1,7 +1,7 @@
 import {ChangeEvent, DragEvent} from 'react'
 import {DashboardListType} from '../../../../api/dashboardAPI'
 import classes from './Dashboard.module.css'
-import Input from '../../../form/input/Input';
+import Input from '../../../form/input/Input'
 import {
     changeEditDashboardAC,
     editMovingElement,
@@ -10,7 +10,7 @@ import {
 } from '../../../../redux/reducers/dashboardReducer'
 import {useAppDispatch, useAppSelector} from '../../../../redux/hooks'
 import Task from './task/Task.tsx';
-import CreateTask from './task/CreateTask.tsx';
+import CreateTask from './task/CreateTask.tsx'
 
 
 type DashboardProps = {
@@ -51,41 +51,40 @@ const Dashboard = (props: DashboardProps) => {
     }
 
     return (
-        <div draggable={true}
-             onDragStart={(e: DragEvent<HTMLDivElement>) => onDragStartHandler(e, data)} // Взяли карточку.
-             onDragEnd={() => {
-                 onDragEndHandler()
-             }}
-             onDragLeave={(e: DragEvent<HTMLDivElement>) => {
-                 onDragLeaveHandler(e)
-             }}
-             onDragOver={(e: DragEvent<HTMLDivElement>) => {
-                 onDragOverHandler(e)
+        <div className={classes.container} >
+            <div className={classes.grab} draggable={true}
+                 onDragStart={(e: DragEvent<HTMLDivElement>) => {
+                     onDragStartHandler(e, data)
+                 }}
+                 onDragEnd={() => {
+                     onDragEndHandler()
+                 }}
+                 onDragLeave={(e: DragEvent<HTMLDivElement>) => {
+                     onDragLeaveHandler(e)
+                 }}
+                 onDragOver={(e: DragEvent<HTMLDivElement>) => {
+                     onDragOverHandler(e)
 
-             }}
-             onDrop={(e: DragEvent<HTMLDivElement>) => {
-                 onDragDropHandler(e, data)
-             }}
+                 }}
+                 onDrop={(e: DragEvent<HTMLDivElement>) => {
+                     onDragDropHandler(e, data)
+                 }}>
+                <div onDoubleClick={() => dispatch(setEditDashboardAC(data.id))}
+                     className={edit ? classes.hide : classes.show}>
+                    {data.title}
+                </div>
 
-             className={classes.container}
-        >
-
-            <div onDoubleClick={() => dispatch(setEditDashboardAC(data.id))}
-                 className={edit ? classes.hide : classes.show}>
-                {data.title}
+                <div className={edit ? classes.show : classes.hide}>
+                    <Input
+                        placeholder={data.title}
+                        value={editEl.title}
+                        styles={classes.text}
+                        onchangeHandler={(e: ChangeEvent<HTMLInputElement>) => {
+                            dispatch(changeEditDashboardAC(e.target.value))
+                        }}
+                    />
+                </div>
             </div>
-
-            <div className={edit ? classes.show : classes.hide}>
-                <Input
-                    placeholder={data.title}
-                    value={editEl.title}
-                    styles={classes.text}
-                    onchangeHandler={(e: ChangeEvent<HTMLInputElement>) => {
-                        dispatch(changeEditDashboardAC(e.target.value))
-                    }}
-                />
-            </div>
-
             <hr className={edit ? classes.hide : ''}/>
 
             {data.tasks.map(el => <Task key={el.id} data={el}/>)}
