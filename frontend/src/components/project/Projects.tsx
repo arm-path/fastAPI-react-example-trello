@@ -1,26 +1,19 @@
-import React, {ChangeEvent, useEffect} from 'react'
+import React, {useEffect} from 'react'
 
 import classes from './project.module.css'
-import Input from '../form/input/Input.tsx'
-import Button from '../form/button/Button.tsx'
 import withAuthRedirect from '../hoc/Authentication.tsx'
 import ProjectLink from './ProjectLink.tsx'
-import {
-    changeTitleCreateProjectAC,
-    createProjectThunk,
-    getProjects,
-    setEditFormAC
-} from '../../redux/reducers/projectReducer'
-import {useAppDispatch, useAppSelector} from '../../redux/hooks'
 import Loader from '../auxiliary/Loader.tsx'
-import ButtonLoading from '../form/button/ButtonLoading'
+import ProjectCreate from './detailProject/ProjectCreate.tsx'
+import {getProjects, setEditFormAC} from '../../redux/reducers/projectReducer'
+import {useAppDispatch, useAppSelector} from '../../redux/hooks'
 
 
 const Projects = () => {
     const dispatch = useAppDispatch()
     const projects = useAppSelector(state => state.projects.list)
     const loading = useAppSelector(state => state.projects.loading)
-    const form = useAppSelector(state => state.projects.createForm)
+
     const editForm = useAppSelector(state => state.projects.updateForm)
 
     const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
@@ -49,21 +42,9 @@ const Projects = () => {
                         )
                     }
                     <hr/>
-                    <span className={classes.error}>{form.error}</span>
-                    <Input placeholder='Проект'
-                           value={form.title}
-                           error=''
-                           onchangeHandler={(e: ChangeEvent<HTMLInputElement>) => dispatch(changeTitleCreateProjectAC(e.target.value))}
-                    />
-                    {form.loading
-                        ? <ButtonLoading/>
-                        : <Button type='button' title='Добавить' style='success'
-                                  onClickHandler={() => dispatch(createProjectThunk())}/>}
-
+                    <ProjectCreate/>
                 </div>
-
             </div>
-
         </div>
     )
 }
