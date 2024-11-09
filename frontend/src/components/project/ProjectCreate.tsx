@@ -1,11 +1,11 @@
 import {ChangeEvent} from 'react'
 
-import classes from '../project.module.css'
-import Input from '../../form/input/Input.tsx'
-import Button from '../../form/button/Button.tsx'
-import ButtonLoading from '../../form/button/ButtonLoading.tsx'
-import {changeTitleCreateProjectAC, createProjectThunk} from '../../../redux/reducers/projectReducer.ts'
-import {useAppDispatch, useAppSelector} from '../../../redux/hooks.ts'
+import classes from './project.module.css'
+import Input from '../form/input/Input.tsx'
+import Button from '../form/button/Button.tsx'
+import ButtonLoading from '../form/button/ButtonLoading.tsx'
+import {changeTitleCreateProjectAC, createProjectThunk} from '../../redux/reducers/projectReducer.ts'
+import {useAppDispatch, useAppSelector} from '../../redux/hooks.ts'
 
 const ProjectCreate = () => {
 

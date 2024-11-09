@@ -1,10 +1,11 @@
+import {ChangeEvent, useState} from 'react'
+
 import classes from './Task.module.css';
 import Input from '../../../../form/input/Input.tsx'
 import Textarea from '../../../../form/input/TextArea.tsx'
 import Button from '../../../../form/button/Button.tsx'
-import {ChangeEvent, useState} from 'react';
-import {useAppDispatch} from '../../../../../redux/hooks.ts';
-import {createTaskThunk} from '../../../../../redux/reducers/taskReducer.ts';
+import {useAppDispatch} from '../../../../../redux/hooks.ts'
+import {createTaskThunk} from '../../../../../redux/reducers/taskReducer.ts'
 
 
 type CreateTaskPropsType = {

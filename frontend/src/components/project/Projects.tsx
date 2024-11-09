@@ -4,7 +4,7 @@ import classes from './project.module.css'
 import withAuthRedirect from '../hoc/Authentication.tsx'
 import ProjectLink from './ProjectLink.tsx'
 import Loader from '../auxiliary/Loader.tsx'
-import ProjectCreate from './detailProject/ProjectCreate.tsx'
+import ProjectCreate from './ProjectCreate.tsx'
 import {getProjects, setEditFormAC} from '../../redux/reducers/projectReducer'
 import {useAppDispatch, useAppSelector} from '../../redux/hooks'
 

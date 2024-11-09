@@ -30,8 +30,11 @@ const ProjectLink = (props: ProjectLinkPropsType) => {
             <div className={edit ? classes.hide : classes.show}>
                 <NavLink className={classes.link} to={'project/' + id}>{title}</NavLink>
                 <img className={classes.editImg} src={editIcon} alt=''
-                     onClick={() => dispatch(setEditFormAC(id))}/>
+                     onClick={() => {
+                         dispatch(setEditFormAC(id))
+                     }}/>
             </div>
+
             <span className={classes.error}>{edit && editForm.error}</span>
             <div className={!edit ? classes.hide : classes.showFlex}>
                 <Input placeholder='Проект' value={editForm.title} error='' styles={!edit ? classes.hide : classes.show}
@@ -40,7 +43,9 @@ const ProjectLink = (props: ProjectLinkPropsType) => {
                        }}/>
                 <div>
                     <img className={editForm.loading ? classes.saveLoadingImg : classes.saveImg} src={saveIcon} alt=''
-                         onClick={() => dispatch(updateProjectThunk())}/>
+                         onClick={() => {
+                             dispatch(updateProjectThunk())
+                         }}/>
                 </div>
             </div>
 
