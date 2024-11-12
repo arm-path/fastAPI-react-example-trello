@@ -1,5 +1,5 @@
 import {createAsyncThunk, createSlice, PayloadAction} from '@reduxjs/toolkit'
-import DashboardAPI, {DashboardListType} from '../../api/dashboardAPI.ts';
+import DashboardAPI, {DashboardListType, DashboardType} from '../../api/dashboardAPI.ts';
 
 import {AxiosResponse} from 'axios';
 import {ThunkApiConfig} from '../store.ts';
@@ -80,16 +80,13 @@ export const createDashboard = createAsyncThunk<AxiosResponse<Array<DashboardLis
 )
 
 
-export const movingDashboard = createAsyncThunk<AxiosResponse<Array<DashboardListType>> | undefined, number, ThunkApiConfig>
+export const movingDashboard = createAsyncThunk<AxiosResponse<Array<DashboardListType>> | undefined, DashboardType, ThunkApiConfig>
 (
     'dashboard/moving',
-    async (index: number, thunkAPI) => {
-        const projectID = thunkAPI.getState().projects.detail?.id
+    async (obj: DashboardType, thunkAPI) => {
         const dashboardID = thunkAPI.getState().dashboard.moving?.id
-        if (!projectID) return undefined
         if (!dashboardID) return undefined
-        return await DashboardAPI.moving(projectID, dashboardID, index)
-
+        return await DashboardAPI.moving(obj.project_id, dashboardID, obj.index)
     }
 )
 

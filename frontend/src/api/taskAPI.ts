@@ -21,6 +21,14 @@ const taskAPI = {
         }, {headers: this.headers})
             .then(response => response)
             .catch(error => error)
+    },
+    async moving(task_id: number, dashboard_id: number, index: number): Promise<AxiosResponse> {
+        return await instance.put<AxiosResponse<TaskType>>(`moving-dashboard/${task_id}/`, {
+            index,
+            dashboard_id
+        }, {headers: this.headers})
+            .then(response => response)
+            .catch(error => error)
     }
 }
 

@@ -16,7 +16,7 @@ class Dashboard(Base):
     index: Mapped[int] = mapped_column(Integer, default=0)
 
     project: Mapped['Projects'] = relationship(back_populates='dashboards')
-    tasks: Mapped[List['Task']] = relationship(back_populates='dashboard')
+    tasks: Mapped[List['Task']] = relationship(back_populates='dashboard', order_by='Task.index')
 
     def __str__(self):
         return f'<Dashboard {self.id}: {self.title}>'

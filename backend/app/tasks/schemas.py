@@ -26,6 +26,7 @@ class TaskDetailSchema(TaskBaseSchema):
     updated: datetime
     id: int
     index: int
+    dashboard_id: int
     creator: UserInformationSchema
 
 

@@ -79,18 +79,17 @@ class TaskService(DatabaseService):
         old_dashboard_id = task.dashboard_id
         if dashboard.project_id != task.dashboard.project_id:
             raise DataConflictException
-        if task.dashboard.id != data.dashboard_id:
-            previous_index_to_last = await cls.total_task_in_dashboard(session, task.dashboard_id)
-            await cls.change_index_task(session, task, previous_index_to_last)
-            next_index_to_last = await cls.total_task_in_dashboard(session, data.dashboard_id)
-            values = {'dashboard_id': data.dashboard_id, 'index': next_index_to_last}
-            task = await cls.update(session, {'id': task_id}, values, [selectinload(Task.creator)])
-            task = await cls.change_index_task(session, task, data.index)
-            await StoriesService.story_task_moving_dashboard(session,
-                                                             user,
-                                                             dashboard.project_id,
-                                                             old_dashboard_id,
-                                                             task.dashboard_id)
+        previous_index_to_last = await cls.total_task_in_dashboard(session, task.dashboard_id)
+        await cls.change_index_task(session, task, previous_index_to_last)
+        next_index_to_last = await cls.total_task_in_dashboard(session, data.dashboard_id)
+        values = {'dashboard_id': data.dashboard_id, 'index': next_index_to_last}
+        task = await cls.update(session, {'id': task_id}, values, [selectinload(Task.creator)])
+        task = await cls.change_index_task(session, task, data.index)
+        await StoriesService.story_task_moving_dashboard(session,
+                                                         user,
+                                                         dashboard.project_id,
+                                                         old_dashboard_id,
+                                                         task.dashboard_id)
         return task
 
     @classmethod
@@ -132,7 +131,6 @@ class TaskService(DatabaseService):
             await session.commit()
         except IntegrityError:
             raise IntegrityException
-
 
     @classmethod
     async def change_index_task(cls, session: AsyncSession,

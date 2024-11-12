@@ -2,19 +2,19 @@ import {DragEvent, ReactNode} from 'react'
 import classes from './DragAndDrop.module.css'
 import {useAppDispatch} from '../../redux/hooks.ts'
 import {ActionCreatorWithPayload} from '@reduxjs/toolkit'
+import {DashboardType, TaskType} from '../../api/dashboardAPI.ts';
 
 
-type ObjectType = {
-    id: number;
-    index: number;
-    [key: string]: any;
-}
+type ObjectType = DashboardType | TaskType
+
+type MovingElementAC = (ActionCreatorWithPayload<number, 'dashboardSlice/editMovingElement'>
+    | ActionCreatorWithPayload<number, 'task/editMovingTask'>)
 
 type PropsType = {
     obj: ObjectType
-    setMovingElement: ActionCreatorWithPayload<number, 'dashboardSlice/editMovingElement'>
+    setMovingElement: MovingElementAC
     setIndexElement: any
-    children: ReactNode;
+    children: ReactNode
 }
 
 
@@ -29,7 +29,7 @@ const DragAndDrop = (props: PropsType) => {
 
     const onDragDropHandler = (e: DragEvent<HTMLDivElement>, el: ObjectType) => {
         e.preventDefault()
-        dispatch(props.setIndexElement(el.index))
+        dispatch(props.setIndexElement(el))
         return undefined
     }
 
@@ -37,11 +37,13 @@ const DragAndDrop = (props: PropsType) => {
         e.preventDefault()
         const target = e.target as HTMLElement;
         target.style.background = '#f9f9f9'
+
     }
 
     const onDragLeaveHandler = (e: DragEvent<HTMLDivElement>) => {
         const target = e.target as HTMLElement;
         target.style.background = '#fff'
+
     }
 
     const onDragEndHandler = () => {

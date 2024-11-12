@@ -8,7 +8,7 @@ const instance = axios.create({
     withCredentials: true
 })
 
-type DashboardType = {
+export type DashboardType = {
     id: number,
     title: string,
     color: string | null,
@@ -23,6 +23,7 @@ export type TaskType = {
     created: string,
     updated: string,
     index: 0,
+    dashboard_id: number
     creator: BaseUserType
 }
 
