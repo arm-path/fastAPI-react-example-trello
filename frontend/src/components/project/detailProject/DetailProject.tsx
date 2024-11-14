@@ -8,6 +8,7 @@ import {getProjectThunk} from '../../../redux/reducers/projectReducer.ts'
 import Loader from '../../auxiliary/Loader.tsx'
 import NotFound from '../../auxiliary/NotFound.tsx'
 import DashboardCreate from './dashboard/DashboardCreate.tsx'
+import TaskDetail from './dashboard/task/TaskDetail.tsx';
 
 const DetailProject = () => {
     const params = useParams()
@@ -39,6 +40,8 @@ const DetailProject = () => {
         dispatch(getProjectThunk(Number(params.projectID)))
     }, [])
 
+    const task = useAppSelector((state) => state.tasks.detail)
+
     return (
         <>
             {projectLoading
@@ -53,6 +56,7 @@ const DetailProject = () => {
                                 <DashboardCreate/>
                                 {dashboards.map(el => <Dashboard key={el.id} data={el}/>)}
                             </div>
+                            {task && <TaskDetail task={task}/>}
                         </div>
                     }
                 </>

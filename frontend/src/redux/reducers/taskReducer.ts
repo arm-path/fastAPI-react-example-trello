@@ -2,7 +2,7 @@ import {createAsyncThunk, createSlice, PayloadAction} from '@reduxjs/toolkit'
 import {AxiosResponse} from 'axios';
 import {TaskType} from '../../api/dashboardAPI.ts'
 import {ThunkApiConfig} from '../store.ts'
-import TaskAPI from '../../api/taskAPI.ts';
+import TaskAPI, {TaskDetailType} from '../../api/taskAPI.ts';
 import {getDashboards} from './dashboardReducer.ts';
 
 type InitialState = {
@@ -11,6 +11,8 @@ type InitialState = {
         id: number | null,
         loading: boolean
     },
+    isGetDetail: boolean,
+    detail: TaskDetailType | null
 }
 
 const initialState: InitialState = {
@@ -19,6 +21,8 @@ const initialState: InitialState = {
         id: null,
         loading: false
     },
+    isGetDetail: false,
+    detail: null
 }
 
 
@@ -61,6 +65,14 @@ export const movingTaskThunk = createAsyncThunk<AxiosResponse<TaskType> | undefi
     }
 )
 
+export const detailTaskThunk = createAsyncThunk<AxiosResponse<TaskDetailType> | undefined, number>
+(
+    'task/detail',
+    async (task_id: number) => {
+        return await TaskAPI.detail(task_id)
+    }
+)
+
 
 const taskSlice = createSlice({
     name: 'task',
@@ -68,6 +80,9 @@ const taskSlice = createSlice({
     reducers: {
         editMovingTask(state, action: PayloadAction<number>) {
             state.moving.id = action.payload
+        },
+        closeDetailModal(state) {
+            state.detail = null
         }
     },
     extraReducers: builder => {
@@ -95,6 +110,18 @@ const taskSlice = createSlice({
                 state.moving.id = null
                 state.moving.loading = false
             })
+            .addCase(detailTaskThunk.pending, (state) => {
+                state.isGetDetail = true
+            })
+            .addCase(detailTaskThunk.fulfilled, (state, action) => {
+                if (action.payload) {
+                    if (action.payload.status === 200) {
+                        state.detail = action.payload.data
+                        console.log(action.payload.data)
+                    }
+                }
+                state.isGetDetail = false
+            })
     }
 })
 
@@ -102,5 +129,6 @@ const taskSlice = createSlice({
 export default taskSlice.reducer
 
 export const {
-    editMovingTask
+    editMovingTask,
+    closeDetailModal
 } = taskSlice.actions

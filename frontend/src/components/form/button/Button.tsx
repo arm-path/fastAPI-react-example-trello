@@ -15,6 +15,9 @@ const Button = ({type, title, style, disabled, onClickHandler}: ButtonPropsType)
             case 'success':
                 btnStyle = btnStyle + classes.buttonSuccess
                 break
+            case 'danger':
+                btnStyle = btnStyle + classes.buttonDanger
+                break
             default:
                 btnStyle = btnStyle + classes.buttonSuccess
         }

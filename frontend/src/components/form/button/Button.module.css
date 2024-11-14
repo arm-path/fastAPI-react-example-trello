@@ -17,6 +17,15 @@
     cursor: pointer;
 }
 
+.buttonDanger {
+    background-color: #97327a;
+}
+
+.buttonDanger:hover {
+    background-color: #a53c87;
+    cursor: pointer;
+}
+
 .buttonLoader {
     border: none;
     border-radius: 5px;
