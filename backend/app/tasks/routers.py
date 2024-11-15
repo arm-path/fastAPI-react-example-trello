@@ -28,7 +28,7 @@ async def create_task(session: Annotated[AsyncSession, Depends(db_settings.get_s
     return await TaskService.create_task(session, user, data)
 
 
-@router.put('/update/{task_id}/', response_model=TaskDetailSchema)
+@router.put('/update/{task_id}/', response_model=TaskExtendedDetailSchema)
 async def update_task(session: Annotated[AsyncSession, Depends(db_settings.get_session)],
                       user: Annotated[UserRead, Depends(current_user)],
                       task_id: int,

@@ -2,8 +2,17 @@ import {createAsyncThunk, createSlice, PayloadAction} from '@reduxjs/toolkit'
 import {AxiosResponse} from 'axios';
 import {TaskType} from '../../api/dashboardAPI.ts'
 import {ThunkApiConfig} from '../store.ts'
-import TaskAPI, {TaskDetailType} from '../../api/taskAPI.ts';
-import {getDashboards} from './dashboardReducer.ts';
+import TaskAPI from '../../api/taskAPI.ts'
+import taskAPI, {TaskDetailType, TaskUpdateValue} from '../../api/taskAPI.ts'
+import {getDashboards} from './dashboardReducer.ts'
+
+
+export type EditFieldType = 'title' | 'deadline' | 'description'
+
+type EditDetailType = {
+    field: EditFieldType
+    value: string
+}
 
 type InitialState = {
     createLoading: boolean,
@@ -12,7 +21,10 @@ type InitialState = {
         loading: boolean
     },
     isGetDetail: boolean,
-    detail: TaskDetailType | null
+    detail: TaskDetailType | null,
+    editDetail: EditDetailType | null
+    editDetailLoading: boolean
+    editDetailError: string
 }
 
 const initialState: InitialState = {
@@ -22,7 +34,10 @@ const initialState: InitialState = {
         loading: false
     },
     isGetDetail: false,
-    detail: null
+    detail: null,
+    editDetail: null,
+    editDetailLoading: false,
+    editDetailError: ''
 }
 
 
@@ -73,6 +88,20 @@ export const detailTaskThunk = createAsyncThunk<AxiosResponse<TaskDetailType> | 
     }
 )
 
+export const updateTaskThunk = createAsyncThunk<AxiosResponse<TaskDetailType> | undefined, void, ThunkApiConfig>
+(
+    'task/update',
+    async (_, thunkAPI) => {
+        const task = thunkAPI.getState().tasks.detail
+        const updateField = thunkAPI.getState().tasks.editDetail
+        if (task && updateField) {
+            const value: TaskUpdateValue = {[updateField.field]: updateField.value} as TaskUpdateValue
+            return await taskAPI.update(task.id, value)
+
+        } else return undefined
+    }
+)
+
 
 const taskSlice = createSlice({
     name: 'task',
@@ -80,9 +109,24 @@ const taskSlice = createSlice({
     reducers: {
         editMovingTask(state, action: PayloadAction<number>) {
             state.moving.id = action.payload
+            state.editDetailError = ''
         },
         closeDetailModal(state) {
             state.detail = null
+            state.editDetail = null
+            state.editDetailError = ''
+        },
+        editDetailField(state, action: PayloadAction<EditDetailType>) {
+            if (state.editDetail) {
+                if (state.editDetail.field !== action.payload.field) {
+                    state.editDetail = null
+                }
+            }
+            state.editDetail = {
+                field: action.payload.field,
+                value: action.payload.value
+            }
+            state.editDetailError = ''
         }
     },
     extraReducers: builder => {
@@ -112,6 +156,7 @@ const taskSlice = createSlice({
             })
             .addCase(detailTaskThunk.pending, (state) => {
                 state.isGetDetail = true
+                state.editDetail = null
             })
             .addCase(detailTaskThunk.fulfilled, (state, action) => {
                 if (action.payload) {
@@ -122,6 +167,22 @@ const taskSlice = createSlice({
                 }
                 state.isGetDetail = false
             })
+            .addCase(updateTaskThunk.pending, (state) => {
+                state.editDetailLoading = true
+                state.editDetailError = ''
+
+            })
+            .addCase(updateTaskThunk.fulfilled, (state, action) => {
+                if (action.payload) {
+                    if (action.payload.status === 200) {
+                        state.detail = action.payload.data
+                        state.editDetail = null
+                    } else {
+                        state.editDetailError = 'Ошибка: Не удалось изменит поле!'
+                    }
+                }
+                state.editDetailLoading = false
+            })
     }
 })
 
@@ -130,5 +191,6 @@ export default taskSlice.reducer
 
 export const {
     editMovingTask,
-    closeDetailModal
+    closeDetailModal,
+    editDetailField
 } = taskSlice.actions

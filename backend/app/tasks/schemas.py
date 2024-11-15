@@ -2,6 +2,7 @@ from datetime import datetime
 from typing import List
 
 from pydantic import BaseModel, Field
+from pydantic.v1 import validator
 
 from app.files.schemas import FileCreateResponseSchema
 from app.users.schemas import UserInformationSchema
@@ -17,8 +18,17 @@ class TaskCreateSchema(TaskBaseSchema):
     description: str | None = None
 
 
-class TaskUpdateSchema(TaskBaseSchema):
+class TaskUpdateSchema(BaseModel):
+    title: str = None
+    deadline: datetime = None
     description: str | None = None
+
+    @validator('title', 'deadline', 'description', always=True)
+    def check_only_one_field(cls, v, values, field):
+        if v is not None and any(
+                values.get(f) is not None for f in ['title', 'deadline', 'description'] if f != field.name):
+            raise ValueError('Only one field must be provided')
+        return v
 
 
 class TaskDetailSchema(TaskBaseSchema):

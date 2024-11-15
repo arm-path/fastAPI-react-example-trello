@@ -38,7 +38,8 @@ class TaskService(DatabaseService):
                           data: TaskUpdateSchema):
         task = await cls.get_task_dashboard_project(session, task_id)
         dashboard = cls.access_check(user, task.dashboard)
-        task = await cls.update(session, {'id': task_id}, data.model_dump())
+        options = [selectinload(Task.responsible_users), selectinload(Task.files)]
+        task = await cls.update(session, {'id': task_id}, data.model_dump(exclude_unset=True), options=options)
         await StoriesService.story_update_task(session, user, dashboard.project_id, task)
         return task
 

@@ -2,6 +2,7 @@ import axios, {AxiosResponse} from 'axios'
 import Cookies from 'js-cookie'
 import {TaskType} from './dashboardAPI.ts'
 import {BaseUserType} from './userAPI.ts'
+import {EditFieldType} from '../redux/reducers/taskReducer.ts';
 
 
 const instance = axios.create({
@@ -21,6 +22,15 @@ export type TaskDetailType = TaskType & {
     files: Array<TaskFiles>
 }
 
+export type TaskUpdateValueType =
+    { title: string; deadline?: never; description?: never }
+    | { title?: never; deadline: string; description?: never }
+    | { title?: never; deadline?: never; description: string }
+
+
+export type TaskUpdateValue = {
+    [key in EditFieldType]: string
+}
 
 const taskAPI = {
     headers: {'Authorization': 'Bearer ' + Cookies.get('access_token')},
@@ -45,6 +55,11 @@ const taskAPI = {
     },
     async detail(task_id: number): Promise<AxiosResponse> {
         return await instance.get<AxiosResponse<TaskDetailType>>(`detail/${task_id}/`, {headers: this.headers})
+            .then(response => response)
+            .catch(error => error)
+    },
+    async update(task_id: number, value: TaskUpdateValue): Promise<AxiosResponse> {
+        return await instance.put(`update/${task_id}/`, value, {headers: this.headers})
             .then(response => response)
             .catch(error => error)
     }

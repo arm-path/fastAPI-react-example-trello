@@ -9,7 +9,10 @@
 
 .title {
     font-weight: bold;
+}
 
+.header {
+    display: flex;
 }
 
 .createTaskContainer {
@@ -58,5 +61,16 @@
 }
 
 .modalClose {
+    margin-left: auto;
     text-align: right;
+}
+
+.errorMessage {
+    font-weight: bold;
+    color: #97327a;
+    opacity: 0.5;
+}
+
+.loadingCursor {
+    cursor: wait;
 }
