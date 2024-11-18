@@ -111,6 +111,7 @@ class TaskService(DatabaseService):
         responsible_tasks = [ResponsibleTask(task_id=task_id, responsible_id=user_id) for user_id in user_ids]
         session.add_all(responsible_tasks)
         await session.commit()
+        return await cls.get_task(session, user, task_id)
 
     @classmethod
     async def task_delete_responsible(cls, session: AsyncSession, user: UserRead, task_id: int, user_ids: List[int]):

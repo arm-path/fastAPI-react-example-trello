@@ -1,11 +1,12 @@
-import classes from './Task.module.css';
-import {TaskDetailType} from '../../../../../api/taskAPI.ts';
-import Button from '../../../../form/button/Button.tsx';
-import {useAppDispatch, useAppSelector} from '../../../../../redux/hooks.ts';
-import {closeDetailModal, editDetailField, updateTaskThunk} from '../../../../../redux/reducers/taskReducer.ts';
-import dateFormat from '../../../../../utils/dateFormat.ts';
-import Input from '../../../../form/input/Input.tsx';
-import React, {ChangeEvent} from 'react';
+import classes from './Task.module.css'
+import {TaskDetailType} from '../../../../../api/taskAPI.ts'
+import Button from '../../../../form/button/Button.tsx'
+import {useAppDispatch, useAppSelector} from '../../../../../redux/hooks.ts'
+import {closeDetailModal, editDetailField, updateTaskThunk} from '../../../../../redux/reducers/taskReducer.ts'
+import dateFormat from '../../../../../utils/dateFormat.ts'
+import Input from '../../../../form/input/Input.tsx'
+import React, {ChangeEvent} from 'react'
+import TaskResponsible from './TaskResponsible.tsx'
 
 
 type PropsType = {
@@ -94,12 +95,7 @@ const TaskDetail = (props: PropsType) => {
                     <b>Создал: </b>
                     {task.creator.email} ({task.creator.first_name} {task.creator.last_name})
                 </div>
-                <div>
-                    <b>Ответственные: </b>
-                    <span>
-                        {task.responsible.map(el => `${el.email} (${el.first_name} ${el.last_name})  `)}
-                    </span>
-                </div>
+                <TaskResponsible responsible={task.responsible}/>
 
             </div>
         </div>

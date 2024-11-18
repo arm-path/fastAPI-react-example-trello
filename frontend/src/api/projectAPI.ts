@@ -35,7 +35,7 @@ export type ProjectDetailType = {
     id: number,
     title: string
     user: BaseUserType
-    invitations: BaseInvitationType
+    invitations: Array<BaseInvitationType>
 
 }
 

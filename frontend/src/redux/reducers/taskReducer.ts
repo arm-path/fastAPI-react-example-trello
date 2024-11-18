@@ -102,6 +102,19 @@ export const updateTaskThunk = createAsyncThunk<AxiosResponse<TaskDetailType> | 
     }
 )
 
+export const assignUsersForTaskThunk = createAsyncThunk<
+    AxiosResponse<TaskDetailType> | undefined,
+    number,
+    ThunkApiConfig>
+(
+    'task/assignUsers',
+    async (user_id, thunkAPI) => {
+        const task_id = thunkAPI.getState().tasks.detail?.id
+        if (!task_id) return undefined
+        return taskAPI.assignUser(task_id, user_id)
+    }
+)
+
 
 const taskSlice = createSlice({
     name: 'task',
@@ -127,7 +140,8 @@ const taskSlice = createSlice({
                 value: action.payload.value
             }
             state.editDetailError = ''
-        }
+        },
+
     },
     extraReducers: builder => {
         builder
@@ -182,6 +196,13 @@ const taskSlice = createSlice({
                     }
                 }
                 state.editDetailLoading = false
+            })
+            .addCase(assignUsersForTaskThunk.fulfilled, (state, action) => {
+                if (action.payload) {
+                    if (action.payload.status === 200) {
+                        state.detail = action.payload.data
+                    }
+                }
             })
     }
 })

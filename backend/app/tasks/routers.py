@@ -73,7 +73,7 @@ async def get_task(session: Annotated[AsyncSession, Depends(db_settings.get_sess
     return await TaskService.get_task(session, user, task_id)
 
 
-@router.post('/assign-users/{task_id}', response_model=TaskDetailSchema)
+@router.post('/assign-users/{task_id}', response_model=TaskExtendedDetailSchema)
 async def task_assign_responsible(session: Annotated[AsyncSession, Depends(db_settings.get_session)],
                                   user: Annotated[UserRead, Depends(current_user)],
                                   task_id: int,

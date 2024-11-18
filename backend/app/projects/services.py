@@ -57,7 +57,7 @@ class ProjectService(DatabaseService):
                 selectinload(cls.model.user),
                 selectinload(cls.model.invitations).options(selectinload(ProjectUsers.invited_user)),
                 defer(cls.model.user_id)
-            )
+            ).limit(1)
         )
         result: Result[tuple[Projects]] = await session.execute(query)
         project = result.scalar_one_or_none()
