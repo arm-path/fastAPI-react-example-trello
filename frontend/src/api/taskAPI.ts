@@ -59,12 +59,20 @@ const taskAPI = {
             .catch(error => error)
     },
     async update(task_id: number, value: TaskUpdateValue): Promise<AxiosResponse> {
-        return await instance.put(`update/${task_id}/`, value, {headers: this.headers})
+        return await instance.put<AxiosResponse<TaskDetailType>>(`update/${task_id}/`, value, {headers: this.headers})
             .then(response => response)
             .catch(error => error)
     },
     async assignUser(task_id: number, user_id: number): Promise<AxiosResponse> {
         return await instance.post(`assign-users/${task_id}/`, {user_ids: [user_id,]}, {headers: this.headers})
+            .then(response => response)
+            .catch(error => error)
+    },
+    async deleteUser(task_id: number, user_id: number): Promise<AxiosResponse> {
+        return await instance.put<AxiosResponse<TaskDetailType>>(
+            `delete-users/${task_id}/`,
+            {user_ids: [user_id,]},
+            {headers: this.headers})
             .then(response => response)
             .catch(error => error)
     }

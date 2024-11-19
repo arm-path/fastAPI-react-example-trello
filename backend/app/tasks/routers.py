@@ -81,7 +81,7 @@ async def task_assign_responsible(session: Annotated[AsyncSession, Depends(db_se
     return await TaskService.task_assign_responsible(session, user, task_id, data.user_ids)
 
 
-@router.delete('/delete-users/{task_id}', status_code=status.HTTP_204_NO_CONTENT)
+@router.put('/delete-users/{task_id}', response_model=TaskExtendedDetailSchema)
 async def task_delete_responsible(session: Annotated[AsyncSession, Depends(db_settings.get_session)],
                                   user: Annotated[UserRead, Depends(current_user)],
                                   task_id: int,

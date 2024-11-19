@@ -4,11 +4,12 @@ type ButtonPropsType = {
     type: 'button' | 'submit' | 'reset' | undefined
     title: string
     style: 'success' | 'danger' | 'warning' | 'info'
+    className?: string
     disabled?: boolean
     onClickHandler: () => void
 }
 
-const Button = ({type, title, style, disabled, onClickHandler}: ButtonPropsType) => {
+const Button = ({type, title, style, className, disabled, onClickHandler}: ButtonPropsType) => {
     let btnStyle: string = classes.button + ' '
     if (!disabled) {
         switch (style) {
@@ -22,7 +23,9 @@ const Button = ({type, title, style, disabled, onClickHandler}: ButtonPropsType)
                 btnStyle = btnStyle + classes.buttonSuccess
         }
     }
-
+    if (className) {
+        btnStyle += `${btnStyle} ${className}`
+    }
     return (
         <>
             <button type={type} className={btnStyle} onClick={onClickHandler}>

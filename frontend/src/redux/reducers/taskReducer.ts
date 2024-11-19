@@ -115,6 +115,20 @@ export const assignUsersForTaskThunk = createAsyncThunk<
     }
 )
 
+export const deleteUsersForTaskThunk = createAsyncThunk<
+    AxiosResponse<TaskDetailType> | undefined,
+    number,
+    ThunkApiConfig
+>
+(
+    'task/deleteUser',
+    async (user_id: number, thunkAPI) => {
+        const task_id = thunkAPI.getState().tasks.detail?.id
+        if (!task_id) return undefined
+        return taskAPI.deleteUser(task_id, user_id)
+    }
+)
+
 
 const taskSlice = createSlice({
     name: 'task',
@@ -198,6 +212,13 @@ const taskSlice = createSlice({
                 state.editDetailLoading = false
             })
             .addCase(assignUsersForTaskThunk.fulfilled, (state, action) => {
+                if (action.payload) {
+                    if (action.payload.status === 200) {
+                        state.detail = action.payload.data
+                    }
+                }
+            })
+            .addCase(deleteUsersForTaskThunk.fulfilled, (state, action) => {
                 if (action.payload) {
                     if (action.payload.status === 200) {
                         state.detail = action.payload.data

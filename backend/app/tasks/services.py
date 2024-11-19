@@ -104,7 +104,9 @@ class TaskService(DatabaseService):
         task = await cls.get_task_dashboard_project(session, task_id)
         cls.access_check(user, task.dashboard)
         user_ids_set = set(user_ids)
-        invited_user_ids = {users.id for users in task.dashboard.project.invited_users}
+        invited_users = list(task.dashboard.project.invited_users)
+        invited_users.append(task.dashboard.project.user)
+        invited_user_ids = {users.id for users in invited_users}
         all_users_exist = user_ids_set.issubset(invited_user_ids)
         if not all_users_exist:
             raise WrongUserIdsException
@@ -133,6 +135,8 @@ class TaskService(DatabaseService):
             await session.commit()
         except IntegrityError:
             raise IntegrityException
+
+        return await cls.get_task(session, user, task_id)
 
     @classmethod
     async def change_index_task(cls, session: AsyncSession,

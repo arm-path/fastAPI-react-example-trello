@@ -76,12 +76,22 @@
 }
 
 .responsibleContainer {
-    display: flex;
-    align-items: center;
+    max-width: 50%;
 }
 
 .responsibleUsers {
-    margin-left: 1rem;
-    margin-bottom: 10px;
-    padding-bottom: 15px;
+    margin-top: -25px;
+}
+
+.responsibleUserRemove {
+    padding: 3px 6px;
+    margin-bottom: 6px;
+    font-size: 12px;
+    border-radius: 30%;
+
+}
+
+.textLineThrough{
+    margin-right: 3px;
+    text-decoration: line-through
 }
