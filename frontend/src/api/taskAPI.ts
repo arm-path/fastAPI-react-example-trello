@@ -10,7 +10,7 @@ const instance = axios.create({
     withCredentials: true
 })
 
-type TaskFiles = {
+export type TaskFilesType = {
     id: number,
     url: string,
     user: BaseUserType
@@ -19,7 +19,7 @@ type TaskFiles = {
 export type TaskDetailType = TaskType & {
     description: string,
     responsible: Array<BaseUserType>
-    files: Array<TaskFiles>
+    files: Array<TaskFilesType>
 }
 
 export type TaskUpdateValueType =

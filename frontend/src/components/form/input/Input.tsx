@@ -4,7 +4,7 @@ import React from "react";
 type InputPropsType = {
     type?: string,
     placeholder: string,
-    value: string,
+    value: string | FormData | File | null,
     error?: string,
     styles?: string,
     containerStyles?: string,
@@ -18,13 +18,24 @@ const Input = (props: InputPropsType) => {
     return (
         <div className={containerStyles}>
             <span className={classes.msgError}>{error}</span>
-            <input className={classes.text + ' ' + styles}
-                   type={type}
-                   placeholder={placeholder}
-                   value={value}
-                   onChange={onchangeHandler}
-                   onBlur={onBlurHandler}
-            />
+            {type === 'file' ? (
+                <input
+                    className={classes.text + ' ' + styles}
+                    type={type}
+                    placeholder={placeholder}
+                    onChange={onchangeHandler}
+                    onBlur={onBlurHandler}
+                />
+            ) : (
+                <input
+                    className={classes.text + ' ' + styles}
+                    type={type}
+                    placeholder={placeholder}
+                    value={value as string}
+                    onChange={onchangeHandler}
+                    onBlur={onBlurHandler}
+                />
+            )}
         </div>
     )
 }

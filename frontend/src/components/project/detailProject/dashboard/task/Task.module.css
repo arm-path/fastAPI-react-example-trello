@@ -91,7 +91,35 @@
 
 }
 
-.textLineThrough{
+.textLineThrough {
     margin-right: 3px;
     text-decoration: line-through
+}
+
+.filesContainer {
+    width: 50%;
+}
+
+.files {
+    margin-right: 0.5rem;
+}
+
+.thumbnail {
+    max-width: 50px;
+    border-radius: 5px;
+}
+
+.filesImages {
+    max-width: 150px;
+    border-radius: 10px;
+}
+
+.filesAddContainer {
+    display: flex;
+    align-items: center;
+}
+
+.btnFileAdd {
+    margin-bottom: 2rem;
+    margin-left: 1rem;
 }

@@ -2,9 +2,10 @@ import {createAsyncThunk, createSlice, PayloadAction} from '@reduxjs/toolkit'
 import {AxiosResponse} from 'axios';
 import {TaskType} from '../../api/dashboardAPI.ts'
 import {ThunkApiConfig} from '../store.ts'
-import TaskAPI from '../../api/taskAPI.ts'
+import TaskAPI, {TaskFilesType} from '../../api/taskAPI.ts'
 import taskAPI, {TaskDetailType, TaskUpdateValue} from '../../api/taskAPI.ts'
 import {getDashboards} from './dashboardReducer.ts'
+import FilesAPI from '../../api/filesAPI.ts';
 
 
 export type EditFieldType = 'title' | 'deadline' | 'description'
@@ -25,6 +26,9 @@ type InitialState = {
     editDetail: EditDetailType | null
     editDetailLoading: boolean
     editDetailError: string
+    files: {
+        value: FormData | File | null
+    }
 }
 
 const initialState: InitialState = {
@@ -37,7 +41,10 @@ const initialState: InitialState = {
     detail: null,
     editDetail: null,
     editDetailLoading: false,
-    editDetailError: ''
+    editDetailError: '',
+    files: {
+        value: null
+    }
 }
 
 
@@ -130,6 +137,20 @@ export const deleteUsersForTaskThunk = createAsyncThunk<
 )
 
 
+export const loadFileThunk = createAsyncThunk<
+    AxiosResponse<TaskFilesType> | undefined, number, ThunkApiConfig
+>
+(
+    'task/loadFile',
+    async (task_id, thunkAPI) => {
+        const file: FormData | File | null = thunkAPI.getState().tasks.files.value
+        if (!file) return undefined
+        const response = FilesAPI.load(task_id, file)
+        console.log(response)
+        return response
+    }
+)
+
 const taskSlice = createSlice({
     name: 'task',
     initialState,
@@ -155,6 +176,9 @@ const taskSlice = createSlice({
             }
             state.editDetailError = ''
         },
+        editFileValue(state, action: PayloadAction<FormData | File | null>) {
+            state.files.value = action.payload
+        }
 
     },
     extraReducers: builder => {
@@ -225,6 +249,16 @@ const taskSlice = createSlice({
                     }
                 }
             })
+            .addCase(loadFileThunk.fulfilled, (state, action) => {
+                if (action.payload) {
+                    if (action.payload.status === 200) {
+                        if (state.detail){
+                            const newFile = action.payload.data;
+                            state.detail.files = [...(state.detail?.files || []), newFile]
+                        }
+                    }
+                }
+            })
     }
 })
 
@@ -234,5 +268,6 @@ export default taskSlice.reducer
 export const {
     editMovingTask,
     closeDetailModal,
-    editDetailField
+    editDetailField,
+    editFileValue
 } = taskSlice.actions

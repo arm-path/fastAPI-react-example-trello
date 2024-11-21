@@ -18,3 +18,5 @@ type BaseErrorType = {
 export type APIBaseErrorType = {
     detail: BaseErrorType
 }
+
+export const baseUrl = 'http://localhost:8000/'

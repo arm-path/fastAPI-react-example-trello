@@ -2,16 +2,19 @@ import {createSlice, PayloadAction, Slice} from '@reduxjs/toolkit'
 
 import userAPI from '../../api/userAPI'
 import {AppDispatch} from '../store.ts'
+import {baseUrl} from '../../api/api.ts'
 
 
 type InitialStateType = {
     isAuth: boolean,
     initialization: boolean;
+    baseUrl: string
 }
 
 const initialState: InitialStateType = {
     isAuth: false,
     initialization: false,
+    baseUrl: baseUrl
 }
 
 
