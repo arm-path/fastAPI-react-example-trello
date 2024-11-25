@@ -7,7 +7,7 @@ import dateFormat from '../../../../../utils/dateFormat.ts'
 import Input from '../../../../form/input/Input.tsx'
 import React, {ChangeEvent} from 'react'
 import TaskResponsible from './TaskResponsible.tsx'
-import TaskFiles from './TaskFiles.tsx';
+import Files from './files/Files.tsx';
 
 
 type PropsType = {
@@ -97,7 +97,7 @@ const TaskDetail = (props: PropsType) => {
                     {task.creator.email} ({task.creator.first_name} {task.creator.last_name})
                 </div>
                 <TaskResponsible responsible={task.responsible}/>
-                <TaskFiles task_id={task.id} files={task.files}/>
+                <Files task_id={task.id} files={task.files}/>
 
             </div>
         </div>

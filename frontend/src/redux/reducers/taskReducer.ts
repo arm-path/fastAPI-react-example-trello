@@ -2,8 +2,8 @@ import {createAsyncThunk, createSlice, PayloadAction} from '@reduxjs/toolkit'
 import {AxiosResponse} from 'axios';
 import {TaskType} from '../../api/dashboardAPI.ts'
 import {ThunkApiConfig} from '../store.ts'
-import TaskAPI, {TaskFilesType} from '../../api/taskAPI.ts'
-import taskAPI, {TaskDetailType, TaskUpdateValue} from '../../api/taskAPI.ts'
+import TaskAPI from '../../api/taskAPI.ts'
+import taskAPI, {TaskDetailType, TaskFilesType, TaskUpdateValue} from '../../api/taskAPI.ts'
 import {getDashboards} from './dashboardReducer.ts'
 import FilesAPI from '../../api/filesAPI.ts';
 
@@ -145,9 +145,19 @@ export const loadFileThunk = createAsyncThunk<
     async (task_id, thunkAPI) => {
         const file: FormData | File | null = thunkAPI.getState().tasks.files.value
         if (!file) return undefined
-        const response = FilesAPI.load(task_id, file)
-        console.log(response)
-        return response
+        return FilesAPI.load(task_id, file)
+
+    }
+)
+
+export const deleteFileThunk = createAsyncThunk<
+    number | undefined, number, ThunkApiConfig>
+(
+    'task/deleteFile',
+    async (file_id: number) => {
+        const response = await FilesAPI.delete(file_id)
+        if (response.status === 204) return file_id
+        return undefined
     }
 )
 
@@ -252,10 +262,17 @@ const taskSlice = createSlice({
             .addCase(loadFileThunk.fulfilled, (state, action) => {
                 if (action.payload) {
                     if (action.payload.status === 200) {
-                        if (state.detail){
+                        if (state.detail) {
                             const newFile = action.payload.data;
                             state.detail.files = [...(state.detail?.files || []), newFile]
                         }
+                    }
+                }
+            })
+            .addCase(deleteFileThunk.fulfilled, (state, action) => {
+                if (action.payload) {
+                    if (state.detail) {
+                        state.detail.files = state.detail.files.filter(el => el.id != action.payload)
                     }
                 }
             })

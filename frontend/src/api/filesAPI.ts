@@ -21,6 +21,11 @@ const filesAPI = {
                 }
             }).then(response => response)
             .catch(error => error)
+    },
+    async delete(file_id: number): Promise<AxiosResponse> {
+        return await instance.delete<AxiosResponse>(`delete/${file_id}/`, {headers: this.headers})
+            .then(response => response)
+            .catch(error => error)
     }
 }
 
