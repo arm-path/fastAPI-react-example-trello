@@ -4,11 +4,12 @@ import classes from './DetailProject.module.css'
 import {getDashboards, setEditDashboardAC, updateDashboard} from '../../../redux/reducers/dashboardReducer.ts'
 import {useAppDispatch, useAppSelector} from '../../../redux/hooks.ts'
 import Dashboard from './dashboard/Dashboard.tsx'
-import {getProjectThunk} from '../../../redux/reducers/projectReducer.ts'
+import {getProjectThunk, setShowSettingsDetailAC} from '../../../redux/reducers/projectReducer.ts'
 import Loader from '../../auxiliary/Loader.tsx'
 import NotFound from '../../auxiliary/NotFound.tsx'
 import DashboardCreate from './dashboard/DashboardCreate.tsx'
 import TaskDetail from './dashboard/task/TaskDetail.tsx';
+import SettingsProject from '../settingsProject/SettingsProject.tsx';
 
 const DetailProject = () => {
     const params = useParams()
@@ -42,6 +43,8 @@ const DetailProject = () => {
 
     const task = useAppSelector((state) => state.tasks.detail)
 
+    const showSettings = useAppSelector(state => state.projects.showSettingsDetail)
+
     return (
         <>
             {projectLoading
@@ -50,7 +53,9 @@ const DetailProject = () => {
                     {!project ? <NotFound/>
                         : <div className={classes.container} onClick={handleClick}
                                style={{cursor: dashboardEdit.loading || movingLoading ? 'wait' : 'default'}}>
-                            <div className={classes.settings}>Настройки</div>
+                            <div className={classes.settings} onClick={()=> {
+                                dispatch(setShowSettingsDetailAC(true))
+                            }}> Настройки </div>
                             <h3 className={classes.title}>Панели задач <br/> ( {project.title} ) </h3>
                             <div className={error && classes.error}>{error}</div>
                             <div className={classes.dashboards}>
@@ -58,6 +63,7 @@ const DetailProject = () => {
                                 {dashboards.map(el => <Dashboard key={el.id} data={el}/>)}
                             </div>
                             {task && <TaskDetail task={task}/>}
+                            {showSettings && <SettingsProject/>}
                         </div>
                     }
                 </>

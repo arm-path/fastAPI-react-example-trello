@@ -15,6 +15,7 @@ type InitialState = {
     createForm: CreateForm
     updateForm: UpdateForm
     detail: ProjectDetailType | null
+    showSettingsDetail: boolean
     loading: boolean
 }
 
@@ -45,6 +46,7 @@ const initialState: InitialState = {
         loading: false
     },
     detail: null,
+    showSettingsDetail: false,
     loading: false,
 }
 
@@ -109,6 +111,11 @@ const projectSlice = createSlice({
         changeTitleUpdateProjectAC(state, action: PayloadAction<string>) {
             state.updateForm.title = action.payload
         },
+        setShowSettingsDetailAC(state, action: PayloadAction<boolean>) {
+            if (state.detail) {
+                state.showSettingsDetail = action.payload
+            }
+        }
     },
     extraReducers: (builder) => {
         builder
@@ -184,6 +191,7 @@ export const {
     changeTitleCreateProjectAC,
     changeTitleUpdateProjectAC,
     setEditFormAC,
+    setShowSettingsDetailAC,
 } = projectSlice.actions
 
 const projectReducer = projectSlice.reducer

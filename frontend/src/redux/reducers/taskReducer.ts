@@ -221,12 +221,8 @@ const taskSlice = createSlice({
                 state.editDetail = null
             })
             .addCase(detailTaskThunk.fulfilled, (state, action) => {
-                if (action.payload) {
-                    if (action.payload.status === 200) {
-                        state.detail = action.payload.data
-                        console.log(action.payload.data)
-                    }
-                }
+                if (action.payload)
+                    if (action.payload.status === 200) state.detail = action.payload.data
                 state.isGetDetail = false
             })
             .addCase(updateTaskThunk.pending, (state) => {
