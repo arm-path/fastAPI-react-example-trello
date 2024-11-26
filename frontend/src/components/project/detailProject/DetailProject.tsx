@@ -50,6 +50,7 @@ const DetailProject = () => {
                     {!project ? <NotFound/>
                         : <div className={classes.container} onClick={handleClick}
                                style={{cursor: dashboardEdit.loading || movingLoading ? 'wait' : 'default'}}>
+                            <div className={classes.settings}>Настройки</div>
                             <h3 className={classes.title}>Панели задач <br/> ( {project.title} ) </h3>
                             <div className={error && classes.error}>{error}</div>
                             <div className={classes.dashboards}>

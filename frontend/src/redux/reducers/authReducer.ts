@@ -86,6 +86,17 @@ export const authThunk = createAsyncThunk<
     }
 )
 
+export const logoutThunk = createAsyncThunk<
+    undefined, void, ThunkApiConfig>
+(
+    'auth/logout',
+    (_, thunkAPI) => {
+        Cookies.remove('access_token')
+        thunkAPI.dispatch(changeIsAuthAC(false))
+        return undefined
+    }
+)
+
 
 const authenticationSlice = createSlice({
     name: 'authentication',
@@ -170,6 +181,8 @@ const authenticationSlice = createSlice({
                     state.form.error = 'Произошла ошибка на стороне сервера'
                 }
             }
+        })
+        builder.addCase(logoutThunk.fulfilled, () => {
         })
     }
 })

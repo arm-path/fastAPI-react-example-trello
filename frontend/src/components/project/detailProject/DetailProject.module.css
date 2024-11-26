@@ -32,11 +32,25 @@
     z-index: 9999;
 }
 
-.error{
+.error {
     padding: 10px;
     color: #f9f9f9;
     text-align: center;
     font-style: italic;
     font-weight: bold;
     background-color: #dc3747;
+}
+
+.settings {
+    cursor: pointer;
+    margin-left: 1rem;
+    color: #272822;
+}
+
+.settings:hover {
+    color: #737478;
+}
+
+.settingsActive {
+    color: #744cb5;
 }

@@ -10,6 +10,7 @@ import Register from './components/auth/Register'
 import {initializeApp} from './redux/reducers/appReducer'
 import Projects from './components/project/Projects'
 import DetailProject from './components/project/detailProject/DetailProject.tsx';
+import Logout from './components/auth/Logout.tsx';
 
 
 function App() {
@@ -29,6 +30,7 @@ function App() {
                 <Routes>
                     <Route path='/register' element={<Register/>}/>
                     <Route path='/login' element={<Login/>}/>
+                    <Route path='/logout' element={<Logout/>}/>
                     <Route path='/projects' element={<Projects/>}/>
                     <Route path='/projects/project/:projectID' element={<DetailProject/>}/>
                 </Routes>
