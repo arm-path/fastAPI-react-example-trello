@@ -2,6 +2,7 @@ import {AxiosResponse} from 'axios'
 import {createAsyncThunk, createSlice, PayloadAction} from '@reduxjs/toolkit'
 import ProjectAPI, {
     CreateResponseType,
+    InvitedProjectType,
     ListProjectType,
     ProjectDetailType,
     ProjectType,
@@ -12,6 +13,7 @@ import {ThunkApiConfig} from '../store'
 
 type InitialState = {
     list: Array<ProjectType>
+    invited_projects: Array<InvitedProjectType>
     createForm: CreateForm
     updateForm: UpdateForm
     detail: ProjectDetailType | null
@@ -34,6 +36,7 @@ export type UpdateForm = {
 
 const initialState: InitialState = {
     list: [],
+    invited_projects: [],
     createForm: {
         title: '',
         loading: false,
@@ -50,13 +53,11 @@ const initialState: InitialState = {
     loading: false,
 }
 
-export const getProjects = createAsyncThunk<AxiosResponse<ListProjectType>, void, ThunkApiConfig>
+export const getProjects = createAsyncThunk<AxiosResponse<ListProjectType>>
 (
     'project/list',
-    async (_, thunkAPI) => {
-        const response = await ProjectAPI.list()
-        console.log(thunkAPI)
-        return response
+    async () => {
+        return await ProjectAPI.list()
     }
 )
 
@@ -125,6 +126,7 @@ const projectSlice = createSlice({
             .addCase(getProjects.fulfilled, (state, action) => {
                 if (action.payload.status === 200) {
                     state.list = action.payload.data.my_projects
+                    state.invited_projects = action.payload.data.invited_projects
                 }
                 state.loading = false
             })

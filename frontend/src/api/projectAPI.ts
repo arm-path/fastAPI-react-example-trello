@@ -18,6 +18,7 @@ export type ProjectType = {
 export type InvitedProjectType = {
     id: number,
     title: string,
+    user_id: number,
 }
 
 export type ListProjectType = {

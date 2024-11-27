@@ -8,8 +8,8 @@ import {getProjectThunk, setShowSettingsDetailAC} from '../../../redux/reducers/
 import Loader from '../../auxiliary/Loader.tsx'
 import NotFound from '../../auxiliary/NotFound.tsx'
 import DashboardCreate from './dashboard/DashboardCreate.tsx'
-import TaskDetail from './dashboard/task/TaskDetail.tsx';
-import SettingsProject from '../settingsProject/SettingsProject.tsx';
+import TaskDetail from './dashboard/task/TaskDetail.tsx'
+import SettingsProject from '../settingsProject/SettingsProject.tsx'
 
 const DetailProject = () => {
     const params = useParams()

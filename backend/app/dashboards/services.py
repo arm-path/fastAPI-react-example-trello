@@ -10,6 +10,7 @@ from app.database import DatabaseService
 from app.exceptions import ProjectNotFoundException
 from app.projects.services import ProjectService
 from app.authentication.schemas import UserRead
+from app.tasks import Task
 
 
 class DashboardService(DatabaseService):
@@ -71,7 +72,8 @@ class DashboardService(DatabaseService):
                              project_id: int) -> List[DashboardReadSchema]:
         await cls.check_project(session, user, project_id)
         filters = {'project_id': project_id}
-        return await cls.get_list(session, filters, [selectinload(cls.model.tasks)], order_by='index')
+        return await cls.get_list(session, filters, [selectinload(cls.model.tasks).selectinload(Task.creator)],
+                                  order_by='index')
 
     @classmethod
     async def get_dashboard(cls, session: AsyncSession,
@@ -80,7 +82,7 @@ class DashboardService(DatabaseService):
                             dashboard_id: int) -> DashboardReadSchema:
         await cls.check_project(session, user, project_id)
         filters = {'id': dashboard_id, 'project_id': project_id}
-        return await cls.get_detail(session, filters, [selectinload(cls.model.tasks)])
+        return await cls.get_detail(session, filters, [selectinload(cls.model.tasks).selectinload(Task.creator)])
 
     @classmethod
     async def moving_dashboard(cls, session: AsyncSession,

@@ -1,3 +1,5 @@
+import classes from './Settings.module.css'
+
 import Modal from '../../auxiliary/Modal.tsx'
 import {setShowSettingsDetailAC} from '../../../redux/reducers/projectReducer.ts'
 import {useAppDispatch} from '../../../redux/hooks.ts'
@@ -9,7 +11,10 @@ const SettingsProject = () => {
     return (
         <Modal closeHandler={() => dispatch(setShowSettingsDetailAC(false))}>
             <div>
-                qwdwqd
+                <h3 className={classes.header}>Настройки проекта</h3>
+                <div>
+                    <b>Приглашенные пользователи: </b>
+                </div>
             </div>
         </Modal>
     )

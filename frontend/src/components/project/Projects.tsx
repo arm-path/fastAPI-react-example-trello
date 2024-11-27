@@ -12,6 +12,7 @@ import {useAppDispatch, useAppSelector} from '../../redux/hooks'
 const Projects = () => {
     const dispatch = useAppDispatch()
     const projects = useAppSelector(state => state.projects.list)
+    const invited_projects = useAppSelector(state => state.projects.invited_projects)
     const loading = useAppSelector(state => state.projects.loading)
 
     const editForm = useAppSelector(state => state.projects.updateForm)
@@ -38,10 +39,31 @@ const Projects = () => {
                         ? <Loader/>
                         : projects.map(
                             (el) =>
-                                <ProjectLink key={el.id} id={el.id} title={el.title} editForm={editForm}/>
+                                <ProjectLink
+                                    key={el.id}
+                                    id={el.id}
+                                    title={el.title}
+                                    editForm={editForm}
+                                    invited={false}
+                                />
                         )
                     }
                     <hr/>
+                    <h3 className={classes.title}>Приглашенные проекты</h3>
+                    <div className={classes.content}>
+                        {loading
+                            ? <Loader/>
+                            : invited_projects.map((el) =>
+                                <ProjectLink
+                                    key={el.id}
+                                    id={el.id}
+                                    title={el.title}
+                                    editForm={editForm}
+                                    invited={true}
+                                />)
+                        }
+                        <hr/>
+                    </div>
                     <ProjectCreate/>
                 </div>
             </div>

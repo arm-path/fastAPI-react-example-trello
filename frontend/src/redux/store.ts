@@ -17,7 +17,27 @@ const rootReducer = combineReducers({
 
 export const store = configureStore(
     {
-        reducer: rootReducer
+        reducer: rootReducer,
+        middleware: (getDefaultMiddleware) =>
+            getDefaultMiddleware({
+                serializableCheck: {
+                    ignoredActions: [
+                        'project/list/fulfilled',
+                        'project/update/fulfilled',
+                        'project/detail/fulfilled',
+                        'dashboard/list/fulfilled',
+                        'dashboard/update/fulfilled',
+                        'task/detail/fulfilled',
+                        'task/create/fulfilled',
+                        'task/update/fulfilled',
+                        'task/assignUsers/fulfilled',
+                        'task/deleteUser/fulfilled',
+                        'task/loadFile/fulfilled',
+                        'task/deleteFile/fulfilled'
+                    ],
+                    ignoredPaths: ['payload.headers'],
+                },
+            }),
     }
 )
 
