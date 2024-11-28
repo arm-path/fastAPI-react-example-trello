@@ -1,3 +1,29 @@
 .header {
     text-align: center;
 }
+
+.inviteContainer {
+    display: flex;
+    align-items: center;
+    width: 80%;
+}
+
+.inviteEmail {
+    margin-right: 8px;
+}
+
+.inviteBtn {
+    margin-bottom: 5px;
+}
+
+.error,
+.success {
+    color: #dc3747;
+    font-weight: bold;
+    font-size: 13px;
+    letter-spacing: 1px;
+}
+
+.success {
+    color: #45a049;
+}

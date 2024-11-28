@@ -1,6 +1,7 @@
 import {AxiosResponse} from 'axios'
 import {createAsyncThunk, createSlice, PayloadAction} from '@reduxjs/toolkit'
 import ProjectAPI, {
+    BaseInvitationType,
     CreateResponseType,
     InvitedProjectType,
     ListProjectType,
@@ -9,11 +10,21 @@ import ProjectAPI, {
     UpdateResponseType
 } from '../../api/projectAPI.ts'
 import {ThunkApiConfig} from '../store'
+import validateEmail from '../../utils/validations/validateEmail.ts';
+import {APIBaseErrorType} from '../../api/api.ts';
+import projectAPI from '../../api/projectAPI.ts';
 
 
 type InitialState = {
     list: Array<ProjectType>
     invited_projects: Array<InvitedProjectType>
+    inviteUserForm: {
+        email: string | null,
+        emailError: string | null,
+        error: string | null,
+        loading: boolean,
+        invite: boolean
+    }
     createForm: CreateForm
     updateForm: UpdateForm
     detail: ProjectDetailType | null
@@ -37,6 +48,13 @@ export type UpdateForm = {
 const initialState: InitialState = {
     list: [],
     invited_projects: [],
+    inviteUserForm: {
+        email: null,
+        emailError: null,
+        error: null,
+        loading: false,
+        invite: false
+    },
     createForm: {
         title: '',
         loading: false,
@@ -91,6 +109,18 @@ export const getProjectThunk = createAsyncThunk<AxiosResponse<ProjectDetailType>
     }
 )
 
+export const inviteUserThunk = createAsyncThunk<
+    AxiosResponse<BaseInvitationType> | AxiosResponse<APIBaseErrorType> | undefined, void, ThunkApiConfig>
+(
+    'project/inviteUser',
+    async (_, thunkAPI) => {
+        const form = thunkAPI.getState().projects.inviteUserForm
+        const projectId = thunkAPI.getState().projects.detail?.id
+        if (!form.email || form.emailError || !projectId) return undefined
+        else return await projectAPI.inviteUser(projectId, form.email)
+    }
+)
+
 const projectSlice = createSlice({
     name: 'project',
     initialState,
@@ -115,6 +145,18 @@ const projectSlice = createSlice({
         setShowSettingsDetailAC(state, action: PayloadAction<boolean>) {
             if (state.detail) {
                 state.showSettingsDetail = action.payload
+            }
+        },
+        changeInviteUserForm(state, action: PayloadAction<string>) {
+            state.inviteUserForm.email = action.payload
+            state.inviteUserForm.emailError = null
+            state.inviteUserForm.error = null
+            state.inviteUserForm.invite = false
+        },
+        checkInviteUserEmail(state) {
+            if (state.inviteUserForm.email && !validateEmail(state.inviteUserForm.email)) {
+                state.inviteUserForm.emailError = 'Email адрес не действительный!'
+                state.inviteUserForm.invite = false
             }
         }
     },
@@ -186,6 +228,39 @@ const projectSlice = createSlice({
                 }
                 state.loading = false
             })
+            .addCase(inviteUserThunk.pending, (state) => {
+                state.inviteUserForm.loading = true
+            })
+            .addCase(inviteUserThunk.fulfilled, (state, action) => {
+                if (action.payload) {
+                    if (action.payload.status === 200) {
+                        const data = action.payload.data as BaseInvitationType
+                        console.log(data)
+                        state.inviteUserForm.invite = true
+                        state.inviteUserForm.email = null
+                    } else if (action.payload.status === 409 || action.payload.status === 404) {
+                        state.inviteUserForm.invite = false
+                        const error = action.payload.data as APIBaseErrorType
+                        if (error.detail.msg === 'Unique violation error') {
+                            state.inviteUserForm.error = 'Пользователь уже приглашен.'
+                        } else if (error.detail.msg === 'User not found') {
+                            state.inviteUserForm.error = 'Пользователь не существует.'
+                        } else {
+                            state.inviteUserForm.error = 'Конфликт на сервере.'
+                        }
+                    } else if (action.payload.status === 422) {
+                        state.inviteUserForm.invite = false
+                        state.inviteUserForm.error = 'Не прошла валидация данных на сервере.'
+                    } else {
+                        state.inviteUserForm.invite = false
+                        state.inviteUserForm.error = 'Ошибка сервера.'
+                    }
+                } else {
+                    state.inviteUserForm.invite = false
+                    state.inviteUserForm.error = 'Не прошла валидация данных на клиенте.'
+                }
+                state.inviteUserForm.loading = false
+            })
     }
 })
 
@@ -194,6 +269,8 @@ export const {
     changeTitleUpdateProjectAC,
     setEditFormAC,
     setShowSettingsDetailAC,
+    changeInviteUserForm,
+    checkInviteUserEmail
 } = projectSlice.actions
 
 const projectReducer = projectSlice.reducer

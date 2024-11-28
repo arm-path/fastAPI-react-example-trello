@@ -26,7 +26,7 @@ export type ListProjectType = {
     invited_projects: Array<InvitedProjectType>,
 }
 
-type BaseInvitationType = {
+export type BaseInvitationType = {
     id: number,
     accepted: boolean,
     user: BaseUserType
@@ -71,6 +71,13 @@ const projectAPI = {
         return await instance.get(`detail/${id}/`, {headers: this.headers})
             .then((response: AxiosResponse<ProjectDetailType>) => response)
             .catch(error => error)
+    },
+    async inviteUser(project_id: number, email: string): Promise<AxiosResponse> {
+        return await instance.post<AxiosResponse<BaseInvitationType | APIBaseErrorType>>(
+            `invite-user/${project_id}/`, {email}, {headers: this.headers}
+        )
+            .then(response => response)
+            .catch(error => error.response)
     }
 }
 
