@@ -27,3 +27,35 @@
 .success {
     color: #45a049;
 }
+
+.invitedUsersTable {
+    border-collapse: collapse;
+    border: 1px solid rgb(140 140 140);
+    font-family: sans-serif;
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+}
+
+.invitedUsersTable thead {
+    background-color: rgb(228 240 245);
+}
+
+.invitedUsersTable th,
+.invitedUsersTable td {
+    border: 1px solid rgb(160 160 160);
+    padding: 8px 10px;
+}
+
+.invitedUsersTable td:last-of-type {
+    text-align: center;
+}
+
+.invitedUsersTable tbody > .invitedUsersTable tr:nth-of-type(even) {
+    background-color: rgb(237 238 242);
+}
+
+.delete:hover {
+    background-color: #97327a;
+    color: #ffffff;
+    cursor: pointer;
+}

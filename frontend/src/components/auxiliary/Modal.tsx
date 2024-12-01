@@ -10,13 +10,16 @@ type PropsType = {
     contentClickHandler?: (event: React.MouseEvent<HTMLDivElement>) => void
     error?: string
     loading?: boolean
+    size?: 'sm' | 'md' | 'lg' | 'xl'
 }
 
 const Modal = (props: PropsType) => {
 
     let contentClass = classes.content
     if (props.loading) contentClass = contentClass + ' ' + classes.loading
-
+    if (props.size === 'sm') {
+        contentClass = contentClass + ' ' + classes.sm
+    }
     return (
         <div className={classes.container}>
             <div className={contentClass} onClick={props.contentClickHandler}>

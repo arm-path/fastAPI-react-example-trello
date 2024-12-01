@@ -15,7 +15,6 @@ import Logout from './components/auth/Logout.tsx';
 
 function App() {
     const dispatch = useAppDispatch()
-
     useEffect(() => {
         dispatch(initializeApp())
     }, [dispatch])
