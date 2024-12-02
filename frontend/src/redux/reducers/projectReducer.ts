@@ -257,7 +257,11 @@ const projectSlice = createSlice({
                         const data = action.payload.data as BaseInvitationType
                         console.log(data)
                         state.inviteUserForm.invite = true
-                        state.inviteUserForm.email = null
+                        state.inviteUserForm.email = ''
+                        if (state.detail !== null) {
+                            state.detail.invitations.push(data)
+                        }
+
                     } else if (action.payload.status === 409 || action.payload.status === 404) {
                         state.inviteUserForm.invite = false
                         const error = action.payload.data as APIBaseErrorType
