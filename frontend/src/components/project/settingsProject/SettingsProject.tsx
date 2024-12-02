@@ -53,7 +53,10 @@ const SettingsProject = () => {
                 {confirmationModal &&
                     <Modal closeHandler={() => setConfirmationModal(false)} size='sm'>
                         <div>
-                            {invitation ? <ConfirmDeleteModal invitation={invitation}/> : ''}
+                            {invitation ? <ConfirmDeleteModal
+                                invitation={invitation}
+                                setConfirmation={() => setConfirmationModal(false)}
+                            /> : ''}
                         </div>
                     </Modal>
                 }

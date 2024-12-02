@@ -1,6 +1,7 @@
 import {AxiosResponse} from 'axios'
 import {createAsyncThunk, createSlice, PayloadAction} from '@reduxjs/toolkit'
-import ProjectAPI, {
+import ProjectAPI from '../../api/projectAPI.ts'
+import projectAPI, {
     BaseInvitationType,
     CreateResponseType,
     InvitedProjectType,
@@ -12,7 +13,6 @@ import ProjectAPI, {
 import {ThunkApiConfig} from '../store'
 import validateEmail from '../../utils/validations/validateEmail.ts';
 import {APIBaseErrorType} from '../../api/api.ts';
-import projectAPI from '../../api/projectAPI.ts';
 
 
 type InitialState = {
@@ -118,6 +118,26 @@ export const inviteUserThunk = createAsyncThunk<
         const projectId = thunkAPI.getState().projects.detail?.id
         if (!form.email || form.emailError || !projectId) return undefined
         else return await projectAPI.inviteUser(projectId, form.email)
+    }
+)
+
+type DeleteUserProjectPropsType = {
+    projectId: number,
+    invitationId: number
+}
+
+type DeleteUserProjectResponseType = {
+    response: AxiosResponse | AxiosResponse<APIBaseErrorType>,
+    data: DeleteUserProjectPropsType
+}
+
+export const deleteUserThunk = createAsyncThunk<
+    DeleteUserProjectResponseType, DeleteUserProjectPropsType, ThunkApiConfig>
+(
+    'project/deleteUser',
+    async (data: DeleteUserProjectPropsType) => {
+        const response = await projectAPI.deleteUser(data.projectId, data.invitationId)
+        return {response: response, data: data}
     }
 )
 
@@ -258,6 +278,31 @@ const projectSlice = createSlice({
                 } else {
                     state.inviteUserForm.invite = false
                     state.inviteUserForm.error = 'Не прошла валидация данных на клиенте.'
+                }
+                state.inviteUserForm.loading = false
+            })
+            .addCase(deleteUserThunk.pending, (state) => {
+                state.inviteUserForm.loading = true
+            })
+            .addCase(deleteUserThunk.fulfilled, (state, action) => {
+                if (action.payload) {
+                    if (action.payload.response.status === 204) {
+                        state.inviteUserForm.error = null
+                        if (state.detail) {
+                            state.detail.invitations = state.detail.invitations.filter(el => {
+                                return el.id != action.payload.data.invitationId
+                            })
+                        }
+
+                    } else if (action.payload.response.status === 404) {
+                        state.inviteUserForm.error = 'Приглашение не существует.'
+                    } else if (action.payload.response.status === 422) {
+                        state.inviteUserForm.error = 'Не прошла валидация данных на сервере.'
+                    } else if (action.payload.response.status === 403) {
+                        state.inviteUserForm.error = 'Удаление приглашения запрещено.'
+                    } else {
+                        state.inviteUserForm.error = 'Конфликт на сервере.'
+                    }
                 }
                 state.inviteUserForm.loading = false
             })

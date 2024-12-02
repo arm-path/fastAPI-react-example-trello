@@ -4,6 +4,8 @@ from fastapi import APIRouter, status
 from fastapi.params import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.authentication.dependencies import current_user
+from app.authentication.schemas import UserRead
 from app.database import db_settings
 from app.projects.schemas import (CreateProjectSchema,
                                   ReadProjectSchema,
@@ -11,8 +13,6 @@ from app.projects.schemas import (CreateProjectSchema,
                                   InviteUserForProjectSchema, DetailProjectSchema, InvitationsSchema,
                                   ReadListProjectSchema)
 from app.projects.services import ProjectService, ProjectUsersService
-from app.authentication.dependencies import current_user
-from app.authentication.schemas import UserRead
 
 router = APIRouter(
     prefix='/project',
@@ -60,3 +60,10 @@ async def invite_user(user: Annotated[UserRead, Depends(current_user)],
                       project_id: int,
                       data: InviteUserForProjectSchema):
     return await ProjectUsersService.invite_user_project(session, user, project_id, data.email)
+
+
+@router.delete('/delete-user/{project_id}/{invitation_id}/', status_code=status.HTTP_204_NO_CONTENT)
+async def delete_user(user: Annotated[UserRead, Depends(current_user)],
+                      session: Annotated[AsyncSession, Depends(db_settings.get_session)],
+                      project_id: int, invitation_id: int):
+    await ProjectUsersService.delete_user_project(session, user, project_id, invitation_id)

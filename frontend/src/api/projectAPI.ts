@@ -78,6 +78,11 @@ const projectAPI = {
         )
             .then(response => response)
             .catch(error => error.response)
+    },
+    async deleteUser(project_id: number, invitation_id: number): Promise<AxiosResponse> {
+        return await instance.delete(`delete-user/${project_id}/${invitation_id}/`, {headers: this.headers})
+            .then(response => response)
+            .catch(error => error.response)
     }
 }
 

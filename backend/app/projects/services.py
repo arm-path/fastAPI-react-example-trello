@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload, defer
 
 from app.database import DatabaseService
-from app.exceptions import ObjectNotFoundException
+from app.exceptions import ObjectNotFoundException, UserIsNotOwnerProjectException
 from app.projects import Projects, ProjectUsers
 from app.projects.schemas import CreateProjectSchema, UpdateProjectSchema
 from app.authentication.schemas import UserRead
@@ -82,3 +82,15 @@ class ProjectUsersService(DatabaseService):
         values = {'project_id': project.id, 'invited_id': invite_user.id}
         options = [selectinload(cls.model.invited_user)]
         return await cls.create(session, values, options)
+
+    @classmethod
+    async def delete_user_project(cls, session: AsyncSession, user: UserRead, project_id: int, invitation_id: int):
+        filters = {'id': invitation_id, 'project_id': project_id}
+        options = [selectinload(cls.model.project)]
+        invitation = await cls.get_detail(session, filters, options)
+        if not invitation:
+            raise ObjectNotFoundException('Invitation')
+        if invitation.project.user_id != user.id:
+            raise UserIsNotOwnerProjectException
+
+        await cls.delete(session, filters)

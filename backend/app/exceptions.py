@@ -90,3 +90,8 @@ FileNotFoundException = HTTPException(
     status_code=status.HTTP_404_NOT_FOUND,
     detail={'msg': 'File not found'}
 )
+
+UserIsNotOwnerProjectException = HTTPException(
+    status_code=status.HTTP_403_FORBIDDEN,
+    detail={'msg': 'The user is not the owner of the project'}
+)
