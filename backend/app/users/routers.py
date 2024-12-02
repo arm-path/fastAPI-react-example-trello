@@ -7,7 +7,7 @@ from app.authentication.dependencies import current_user
 from app.authentication.schemas import UserRead
 from app.database import db_settings
 from app.projects.schemas import ProjectOwnerSchema
-from app.users.schemas import UserDetailSchema, JoiningProjectSchema
+from app.users.schemas import UserDetailSchema, JoiningProjectSchema, UserUpdateSchema
 from app.users.services import UserService
 
 router = APIRouter(
@@ -18,6 +18,14 @@ router = APIRouter(
 
 @router.get('/detail/', response_model=UserDetailSchema)
 async def get_user(user: Annotated[UserRead, Depends(current_user)]):
+    return user
+
+
+@router.put('/update/', response_model=UserDetailSchema)
+async def update_user(user: Annotated[UserRead, Depends(current_user)],
+                      session: Annotated[AsyncSession, Depends(db_settings.get_session)],
+                      data: UserUpdateSchema):
+    await UserService.update_user(session, user, data)
     return user
 
 

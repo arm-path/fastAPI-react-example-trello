@@ -6,6 +6,7 @@ from app.authentication.schemas import UserRead
 from app.database.services import DatabaseService
 from app.projects import Projects, ProjectUsers
 from app.users import User
+from app.users.schemas import UserUpdateSchema
 
 
 class UserService(DatabaseService):
@@ -14,6 +15,12 @@ class UserService(DatabaseService):
     @classmethod
     async def get_user(cls, session: AsyncSession, filters):
         return await cls.get_detail(session, filters)
+
+    @classmethod
+    async def update_user(cls, session: AsyncSession, user: UserRead, data: UserUpdateSchema):
+        filters = {'id': user.id}
+        values = {'first_name': data.first_name, 'last_name': data.last_name}
+        await cls.update(session, filters, values)
 
     @classmethod
     async def get_other_projects(cls, session: AsyncSession, user: UserRead, accepted):

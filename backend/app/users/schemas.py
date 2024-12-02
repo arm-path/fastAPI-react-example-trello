@@ -15,5 +15,11 @@ class UserDetailSchema(UserInformationSchema):
     is_active: bool
     is_verified: bool
 
+
+class UserUpdateSchema(BaseModel):
+    first_name: str | None
+    last_name: str | None
+
+
 class JoiningProjectSchema(BaseModel):
     project_id: int
