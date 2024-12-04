@@ -1,4 +1,4 @@
-import axios from 'axios'
+import axios, {AxiosResponse} from 'axios'
 import Cookies from 'js-cookie'
 
 import {APIResponseType, APIValidationErrorType} from './api.ts'
@@ -26,16 +26,20 @@ export type BaseUserType = {
 
 
 const userAPI = {
+    headers: {'Authorization': 'Bearer ' + Cookies.get('access_token')},
     async detail() {
-        const headers = {
-            'Authorization': 'Bearer ' + Cookies.get('access_token')
-        }
-        return await instance.get<APIResponseType<UserType | APIValidationErrorType>>('/detail', {headers})
-            .then(
-                response => response
-            ).catch(
-                error => error
-            )
+        return await instance.get<APIResponseType<UserType | APIValidationErrorType>>('detail/',
+            {headers: this.headers})
+            .then(response => response)
+            .catch(error => error.response)
+    },
+    async update(first_name: string, last_name: string): Promise<AxiosResponse> {
+        return await instance.put<APIResponseType<UserType | APIValidationErrorType>>(
+            `update/`,
+            {first_name, last_name},
+            {headers: this.headers})
+            .then(response => response)
+            .catch(error => error.response)
     }
 }
 

@@ -11,6 +11,7 @@ import {initializeApp} from './redux/reducers/appReducer'
 import Projects from './components/project/Projects'
 import DetailProject from './components/project/detailProject/DetailProject.tsx';
 import Logout from './components/auth/Logout.tsx';
+import Profile from './components/profile/Profile.tsx';
 
 
 function App() {
@@ -30,6 +31,7 @@ function App() {
                     <Route path='/register' element={<Register/>}/>
                     <Route path='/login' element={<Login/>}/>
                     <Route path='/logout' element={<Logout/>}/>
+                    <Route path='/profile' element={<Profile/>}/>
                     <Route path='/projects' element={<Projects/>}/>
                     <Route path='/projects/project/:projectID' element={<DetailProject/>}/>
                 </Routes>

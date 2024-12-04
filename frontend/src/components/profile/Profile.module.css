@@ -1,0 +1,24 @@
+.container {
+    padding: 1%;
+    display: grid;
+    grid-template-columns: auto auto;
+    grid-template-areas: 'form detail';
+}
+
+.title {
+    letter-spacing: 3px;
+    color: #737478;
+}
+
+.detail {
+    grid-area: detail;
+}
+
+.form {
+    width: 50%;
+    grid-area: form;
+}
+
+.loading {
+    cursor: wait;
+}

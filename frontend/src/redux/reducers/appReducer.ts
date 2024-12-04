@@ -1,8 +1,10 @@
 import {createSlice, PayloadAction, Slice} from '@reduxjs/toolkit'
+import {AxiosResponse} from 'axios'
 
-import userAPI from '../../api/userAPI'
+import userAPI, {UserType} from '../../api/userAPI'
 import {AppDispatch} from '../store.ts'
 import {baseUrl} from '../../api/api.ts'
+import {setUserDataAC} from './userReducer.ts'
 
 
 type InitialStateType = {
@@ -33,9 +35,10 @@ const appSlice: Slice<InitialStateType> = createSlice({
 
 export const initializeApp = () => async (dispatch: AppDispatch) => {
 
-    const response = await userAPI.detail()
+    const response: AxiosResponse<UserType> = await userAPI.detail()
     if (response.status === 200) {
         dispatch(changeIsAuthAC(true))
+        dispatch(setUserDataAC(response.data))
     } else {
         dispatch(changeIsAuthAC(false))
     }
