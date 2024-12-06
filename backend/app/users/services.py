@@ -23,6 +23,12 @@ class UserService(DatabaseService):
         await cls.update(session, filters, values)
 
     @classmethod
+    async def verified_user(cls, session: AsyncSession, user_id: int):
+        filters = {'id': user_id}
+        values = {'is_active': True, 'is_verified': True}
+        await cls.update(session, filters, values)
+
+    @classmethod
     async def get_other_projects(cls, session: AsyncSession, user: UserRead, accepted):
         query: Select = (
             select(Projects)

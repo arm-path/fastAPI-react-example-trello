@@ -2,6 +2,9 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
+    BACKEND_BASE_URL: str
+    FRONTEND_BASE_URL: str
+
     POSTGRES_HOST: str
     POSTGRES_PORT: int
     POSTGRES_USER: str
@@ -10,6 +13,13 @@ class Settings(BaseSettings):
     DATABASE_ECHO: bool
     AUTH_SECRET_JWT: str
     AUTH_LIFETIME_SECONDS_JWT: int
+    SECRET_EMAIL_CONFIRMATION: str
+    SECRET_USER_MANAGER: str
+
+    SMTP_HOST: str
+    SMTP_PORT: int
+    SMTP_USER: str
+    SMTP_PASSWORD: str
 
     DATABASE_CONVENTION: dict[str, str] = {
         'ix': 'ix_%(column_0_label)s',
