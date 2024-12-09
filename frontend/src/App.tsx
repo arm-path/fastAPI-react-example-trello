@@ -12,6 +12,8 @@ import Projects from './components/project/Projects'
 import DetailProject from './components/project/detailProject/DetailProject.tsx';
 import Logout from './components/auth/Logout.tsx';
 import Profile from './components/profile/Profile.tsx';
+import ForgotPassword from './components/auth/ForgotPassword.tsx';
+import ChangePassword from './components/auth/ChangePassword.tsx';
 
 
 function App() {
@@ -31,6 +33,8 @@ function App() {
                     <Route path='/register' element={<Register/>}/>
                     <Route path='/login' element={<Login/>}/>
                     <Route path='/logout' element={<Logout/>}/>
+                    <Route path='/forgot-password' element={< ForgotPassword/>}/>
+                    <Route path='/change-password/:token' element={< ChangePassword/>}/>
                     <Route path='/profile' element={<Profile/>}/>
                     <Route path='/projects' element={<Projects/>}/>
                     <Route path='/projects/project/:projectID' element={<DetailProject/>}/>

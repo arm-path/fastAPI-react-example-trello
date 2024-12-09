@@ -29,6 +29,9 @@ router.include_router(
     fastapi_users.get_verify_router(UserRead),
 )
 
+router.include_router(
+    fastapi_users.get_reset_password_router(),
+)
 
 @router.get('/activate/{token}/')
 async def activate_user(session: Annotated[AsyncSession, Depends(db_settings.get_session)], token: str):

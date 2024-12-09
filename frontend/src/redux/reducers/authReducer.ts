@@ -5,6 +5,7 @@ import {authAPI, LoginResponseType, RegisterResponseType} from '../../api/authAP
 import {ThunkApiConfig} from '../store'
 import {changeIsAuthAC} from './appReducer'
 import {APIResponseType} from '../../api/api'
+import {AxiosResponse} from 'axios';
 
 type FormFieldType = {
     title: string;
@@ -22,6 +23,16 @@ type  FormStateType = {
 
 type InitialStateType = {
     form: FormStateType;
+    forgotPasswordForm: {
+        success: boolean
+        text: string
+        isLoading: boolean
+    },
+    resetPasswordForm: {
+        success: boolean
+        text: string
+        isLoading: boolean
+    }
 }
 
 const initialState: InitialStateType = {
@@ -39,6 +50,16 @@ const initialState: InitialStateType = {
         valid: false,
         error: '',
         success: ''
+    },
+    forgotPasswordForm: {
+        success: false,
+        text: '',
+        isLoading: false
+    },
+    resetPasswordForm: {
+        success: false,
+        text: '',
+        isLoading: false
     }
 }
 
@@ -83,6 +104,29 @@ export const authThunk = createAsyncThunk<
 
             return {'status': response.status, 'data': response.data}
         }
+    }
+)
+
+export const forgotPasswordThunk = createAsyncThunk<
+    AxiosResponse | undefined, string, ThunkApiConfig>
+(
+    'auth/forgotPassword',
+    async (email: string) => {
+        return await authAPI.forgotPassword(email)
+    }
+)
+
+export type resetPasswordType = {
+    token: string
+    password: string
+}
+
+export const resetPasswordThunk = createAsyncThunk<
+    AxiosResponse | undefined, resetPasswordType>
+(
+    'auth/resetPassword',
+    async (props: resetPasswordType) => {
+        return await authAPI.resetPassword(props.token, props.password)
     }
 )
 
@@ -183,6 +227,51 @@ const authenticationSlice = createSlice({
             }
         })
         builder.addCase(logoutThunk.fulfilled, () => {
+        })
+        builder.addCase(forgotPasswordThunk.pending, (state) => {
+            state.forgotPasswordForm.isLoading = true
+        })
+        builder.addCase(forgotPasswordThunk.fulfilled, (state, action) => {
+            if (action.payload) {
+                if (action.payload.status === 200 || action.payload.status === 202) {
+                    state.forgotPasswordForm.success = true
+                    state.forgotPasswordForm.text = 'Письмо с дальнейшей инструкцией отправлена на электронную почту.'
+                } else if (action.payload.status === 422) {
+                    state.forgotPasswordForm.success = false
+                    state.forgotPasswordForm.text = 'Ошибка валидации данных.'
+                } else if (action.payload.status === 404) {
+                    state.forgotPasswordForm.success = false
+                    state.forgotPasswordForm.text = 'Не найдено.'
+                } else {
+                    state.forgotPasswordForm.success = false
+                    state.forgotPasswordForm.text = 'Произошла ошибка на стороне сервера.'
+                }
+            }
+            state.forgotPasswordForm.isLoading = false
+        })
+        builder.addCase(resetPasswordThunk.pending, (state) => {
+            state.resetPasswordForm.isLoading = true
+        })
+        builder.addCase(resetPasswordThunk.fulfilled, (state, action) => {
+            if (action.payload) {
+                if (action.payload.status === 200 || action.payload.status === 202) {
+                    state.resetPasswordForm.success = true
+                    state.resetPasswordForm.text = 'Пароль успешно изменен.'
+                } else if (action.payload.status === 422) {
+                    state.resetPasswordForm.success = false
+                    state.resetPasswordForm.text = 'Ошибка валидации данных.'
+                } else if (action.payload.status === 404) {
+                    state.resetPasswordForm.success = false
+                    state.resetPasswordForm.text = 'Не найдено.'
+                } else if (action.payload.status === 400) {
+                    state.resetPasswordForm.success = false
+                    state.resetPasswordForm.text = 'Не валидная ссылка.'
+                } else {
+                    state.resetPasswordForm.success = false
+                    state.resetPasswordForm.text = 'Произошла ошибка на стороне сервера.'
+                }
+                state.resetPasswordForm.isLoading = false
+            }
         })
     }
 })

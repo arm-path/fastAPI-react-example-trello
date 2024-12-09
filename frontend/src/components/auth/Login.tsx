@@ -42,7 +42,8 @@ const Login = () => {
                        onchangeHandler={(e: React.ChangeEvent<HTMLInputElement>) => dispatch(changePasswordFormAC(e.target.value))}
                 />
                 <div className={classes.formTitle}>
-                    <NavLink className={classes.link} to='/register'>Регистрация</NavLink>
+                    <div><NavLink className={classes.link} to='/register'>Регистрация</NavLink></div>
+                    <div><NavLink className={classes.link} to='/forgot-password'>Забыли пароль?</NavLink></div>
                 </div>
                 <Button type='button'
                         title='Авторизация'

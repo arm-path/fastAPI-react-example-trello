@@ -28,3 +28,9 @@ def send_email_user_verified(user_email, token):
     link_activate = f'{settings.BACKEND_BASE_URL}auth/activate/{token}'
     content = f"Follow the link to activate your account: <a href='{link_activate}'>Go to</a>"
     send_massage(user_email, subject, content, token)
+
+def send_email_forgot_password(user_email, token):
+    subject = 'Forgot password'
+    link_activate = f'{settings.FRONTEND_BASE_URL}change-password/{token}'
+    content = f"Follow the link to change the password recovery and change: <a href='{link_activate}'>Go to</a>"
+    send_massage(user_email, subject, content, token)

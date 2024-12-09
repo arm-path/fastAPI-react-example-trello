@@ -27,7 +27,7 @@ export type LoginResponseType = LoginType | APIValidationErrorType | APIAuthErro
 
 export const authAPI = {
     async register(email: string, password: string): Promise<AxiosResponse> {
-        return await instance.post<APIResponseType<RegisterResponseType>>('/register', {
+        return await instance.post<APIResponseType<RegisterResponseType>>('/register/', {
             email,
             password
         })
@@ -36,6 +36,16 @@ export const authAPI = {
     },
     async login(username: string, password: string): Promise<AxiosResponse> {
         return await instance.post<APIResponseType<LoginResponseType>>('/login/', qs.stringify({username, password}))
+            .then((response) => response)
+            .catch((error) => error.response)
+    },
+    async forgotPassword(email: string): Promise<AxiosResponse> {
+        return await instance.post<AxiosResponse>('/forgot-password/', {email: email})
+            .then((response) => response)
+            .catch((error) => error.response)
+    },
+    async resetPassword(token: string, password: string): Promise<AxiosResponse> {
+        return await instance.post<AxiosResponse>('/reset-password/', {token, password})
             .then((response) => response)
             .catch((error) => error.response)
     }
