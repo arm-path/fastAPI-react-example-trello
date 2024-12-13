@@ -1,8 +1,8 @@
+import {AxiosResponse} from 'axios'
 import {createAsyncThunk, createSlice, PayloadAction} from '@reduxjs/toolkit'
-import DashboardAPI, {DashboardListType, DashboardType} from '../../api/dashboardAPI.ts';
 
-import {AxiosResponse} from 'axios';
-import {ThunkApiConfig} from '../store.ts';
+import DashboardAPI, {DashboardListType, DashboardType} from '../../api/dashboardAPI.ts'
+import {ThunkApiConfig} from '../store.ts'
 
 type InitialState = {
     list: Array<DashboardListType>

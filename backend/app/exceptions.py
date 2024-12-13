@@ -13,9 +13,8 @@ ObjectNotFoundException = lambda obj: HTTPException(
 
 UnexpectedErrorOccurred = HTTPException(
     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-    detail = {'msg': 'Unexpected error occurred'}
+    detail={'msg': 'Unexpected error occurred'}
 )
-
 
 # Database exceptions.
 UniqueViolationException = HTTPException(

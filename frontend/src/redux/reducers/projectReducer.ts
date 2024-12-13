@@ -19,7 +19,7 @@ type InitialState = {
     list: Array<ProjectType>
     invited_projects: Array<InvitedProjectType>
     inviteUserForm: {
-        email: string | null,
+        email: string,
         emailError: string | null,
         error: string | null,
         loading: boolean,
@@ -49,7 +49,7 @@ const initialState: InitialState = {
     list: [],
     invited_projects: [],
     inviteUserForm: {
-        email: null,
+        email: '',
         emailError: null,
         error: null,
         loading: false,
@@ -109,6 +109,17 @@ export const getProjectThunk = createAsyncThunk<AxiosResponse<ProjectDetailType>
     }
 )
 
+export const deleteProjectThunk = createAsyncThunk<
+    AxiosResponse | undefined, number | undefined>
+(
+    'project/delete',
+    async (projectID) => {
+        if (projectID) return await ProjectAPI.delete(projectID)
+        return undefined
+    }
+)
+
+
 export const inviteUserThunk = createAsyncThunk<
     AxiosResponse<BaseInvitationType> | AxiosResponse<APIBaseErrorType> | undefined, void, ThunkApiConfig>
 (
@@ -122,7 +133,7 @@ export const inviteUserThunk = createAsyncThunk<
 )
 
 type DeleteUserProjectPropsType = {
-    projectId: number,
+    projectId: number | undefined,
     invitationId: number
 }
 
@@ -136,7 +147,8 @@ export const deleteUserThunk = createAsyncThunk<
 (
     'project/deleteUser',
     async (data: DeleteUserProjectPropsType) => {
-        const response = await projectAPI.deleteUser(data.projectId, data.invitationId)
+        const projectID = data.projectId ? data.projectId : -1
+        const response = await projectAPI.deleteUser(projectID, data.invitationId)
         return {response: response, data: data}
     }
 )
@@ -309,6 +321,9 @@ const projectSlice = createSlice({
                     }
                 }
                 state.inviteUserForm.loading = false
+            })
+            .addCase(deleteProjectThunk.fulfilled, (state, action) => {
+                //         TODO: Redirect after delete
             })
     }
 })

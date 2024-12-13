@@ -1,3 +1,7 @@
+.container {
+    position: relative;
+}
+
 .header {
     text-align: center;
 }
@@ -57,5 +61,17 @@
 .delete:hover {
     background-color: #97327a;
     color: #ffffff;
+    cursor: pointer;
+}
+
+.deleteProject {
+    position: absolute;
+    bottom: 5px;
+    right: 25px;
+    color: #c31122;
+    font-weight: bold;
+}
+
+.deleteProject:hover {
     cursor: pointer;
 }

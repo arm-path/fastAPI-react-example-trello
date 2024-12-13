@@ -11,6 +11,7 @@ type PropsType = {
     error?: string
     loading?: boolean
     size?: 'sm' | 'md' | 'lg' | 'xl'
+    contentStyle?: string
 }
 
 const Modal = (props: PropsType) => {
@@ -20,6 +21,8 @@ const Modal = (props: PropsType) => {
     if (props.size === 'sm') {
         contentClass = contentClass + ' ' + classes.sm
     }
+    if (props.contentStyle) contentClass = contentClass + ' ' + props.contentStyle
+
     return (
         <div className={classes.container}>
             <div className={contentClass} onClick={props.contentClickHandler}>

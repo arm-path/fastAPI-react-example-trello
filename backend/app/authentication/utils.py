@@ -17,7 +17,7 @@ def token_decode(token, secret):
         token = jwt.decode(token, secret, algorithms='HS256')
         answer_decode = {'status': 200, 'token': [token, ]}
     except jwt.ExpiredSignatureError:
-        answer_decode = {'status': 401, 'message': 'Token expired.'}
+        answer_decode = {'status': 401, 'message': 'TokenExpired'}
     except Exception as e:
-        answer_decode = {'status': 401, 'message': 'Invalid token.'}
+        answer_decode = {'status': 401, 'message': 'InvalidToken'}
     return answer_decode

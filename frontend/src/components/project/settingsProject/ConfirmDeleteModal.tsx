@@ -1,28 +1,22 @@
-import {BaseInvitationType} from '../../../api/projectAPI.ts'
 import Button from '../../form/button/Button.tsx'
-import {useAppDispatch, useAppSelector} from '../../../redux/hooks.ts'
-import {deleteUserThunk} from '../../../redux/reducers/projectReducer.ts'
+
 
 type PropsType = {
-    invitation: BaseInvitationType
+    title: string
+    deleteHandler: () => void
     setConfirmation: () => void
 }
 
 const ConfirmDeleteModal = (props: PropsType) => {
-    const {invitation, setConfirmation} = props
-
-    const dispatch = useAppDispatch()
-    const projectId = useAppSelector(state => state.projects.detail?.id)
+    const {title, deleteHandler, setConfirmation} = props
 
     return (
         <div>
-            <h4 style={{textAlign: 'center'}}>Вы уверены что хотите удалить пользователя: {invitation.user.email}?</h4>
+            <h4 style={{textAlign: 'center'}}>{title}</h4>
             <div style={{textAlign: 'center'}}>
                 <Button type='button' title='Да' style='success' onClickHandler={() => {
-                    if (projectId) {
-                        dispatch(deleteUserThunk({projectId: projectId, invitationId: invitation.id}))
+                        deleteHandler()
                         setConfirmation()
-                    }
                 }}/>
             </div>
 

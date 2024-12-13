@@ -3,7 +3,7 @@ import {BaseInvitationType} from '../../../api/projectAPI.ts'
 
 type PropsType = {
     invitation: BaseInvitationType
-    confirmationDelete: (el: boolean) => void
+    confirmationDelete: (el: 'invitedUser' | 'project' | null) => void
     invitationDelete: (invitation: BaseInvitationType) => void
 }
 
@@ -16,7 +16,7 @@ const InvitedUsers = (props: PropsType) => {
             <td>{invitation.accepted ? 'Принято' : 'Не принято'}</td>
             <td className={classes.delete} onClick={() => {
                 invitationDelete(invitation)
-                confirmationDelete(true)
+                confirmationDelete('invitedUser')
             }}>Удалить</td>
         </tr>
     )

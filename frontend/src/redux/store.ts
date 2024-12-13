@@ -28,6 +28,7 @@ export const store = configureStore(
                         'project/update/fulfilled',
                         'project/detail/fulfilled',
                         'dashboard/list/fulfilled',
+                        'dashboard/create/fulfilled',
                         'dashboard/update/fulfilled',
                         'task/detail/fulfilled',
                         'task/create/fulfilled',

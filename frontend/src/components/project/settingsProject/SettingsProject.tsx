@@ -2,7 +2,7 @@ import {useState} from 'react'
 
 import classes from './Settings.module.css'
 import Modal from '../../auxiliary/Modal.tsx'
-import {setShowSettingsDetailAC} from '../../../redux/reducers/projectReducer.ts'
+import {deleteProjectThunk, deleteUserThunk, setShowSettingsDetailAC} from '../../../redux/reducers/projectReducer.ts'
 import {useAppDispatch, useAppSelector} from '../../../redux/hooks.ts'
 import InviteInProject from './InviteInProject.tsx'
 import InvitedUsers from './InvitedUsers.tsx'
@@ -12,16 +12,24 @@ import ConfirmDeleteModal from './ConfirmDeleteModal.tsx'
 
 const SettingsProject = () => {
 
-    const [confirmationModal, setConfirmationModal] = useState<boolean>(false)
+    const [confirmationModal, setConfirmationModal] = useState<'invitedUser' | 'project' | null>(null)
     const [invitation, setInvitation] = useState<BaseInvitationType | null>(null)
+    const projectId = useAppSelector(state => state.projects.detail?.id)
+
     const dispatch = useAppDispatch()
+
 
     const invitedUsers = useAppSelector(state => {
         return state.projects.detail?.invitations
     })
 
+    const deleteProjectHandler = () => {
+        dispatch(deleteProjectThunk(projectId))
+    }
+
     return (
-        <Modal closeHandler={() => dispatch(setShowSettingsDetailAC(false))}>
+        <Modal contentStyle={classes.container}
+               closeHandler={() => dispatch(setShowSettingsDetailAC(false))}>
             <div>
                 <h3 className={classes.header}>Настройки проекта</h3>
                 <div>
@@ -50,15 +58,36 @@ const SettingsProject = () => {
                         </tbody>
                     </table>
                 </div>
-                {confirmationModal &&
-                    <Modal closeHandler={() => setConfirmationModal(false)} size='sm'>
+                <div className={classes.deleteProject} onClick={() => setConfirmationModal('project')}>
+                    Удалить проект
+                </div>
+                {confirmationModal === 'invitedUser' ?
+                    <Modal closeHandler={() => setConfirmationModal(null)} size='sm'>
                         <div>
                             {invitation ? <ConfirmDeleteModal
-                                invitation={invitation}
-                                setConfirmation={() => setConfirmationModal(false)}
+                                title={`Вы уверены что хотите удалить пользователя: ${invitation.user.email}?`}
+                                deleteHandler={() => {
+                                    dispatch(deleteUserThunk({
+                                        projectId: projectId,
+                                        invitationId: invitation.id
+                                    }))
+                                }
+
+                                }
+                                setConfirmation={() => setConfirmationModal(null)}
                             /> : ''}
                         </div>
                     </Modal>
+                    : confirmationModal === 'project' ?
+                        <Modal closeHandler={() => setConfirmationModal(null)} size='sm'>
+                            <div>
+                                <ConfirmDeleteModal
+                                    title={'Вы уверены что хотите удалить проект?'}
+                                    deleteHandler={() => deleteProjectHandler()}
+                                    setConfirmation={() => setConfirmationModal(null)}
+                                />
+                            </div>
+                        </Modal> : ''
                 }
             </div>
         </Modal>

@@ -1,7 +1,7 @@
-from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Annotated
 
+from fastapi import APIRouter, Depends, status
+from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.responses import RedirectResponse
 
 from app.authentication.configuration import auth_backend
@@ -33,12 +33,22 @@ router.include_router(
     fastapi_users.get_reset_password_router(),
 )
 
+
 @router.get('/activate/{token}/')
 async def activate_user(session: Annotated[AsyncSession, Depends(db_settings.get_session)], token: str):
     message = token_decode(token, settings.SECRET_EMAIL_CONFIRMATION)
 
     if message['status'] == 401:
-        raise HTTPException(status_code=401, detail=message)
+        return RedirectResponse(url=f'{settings.FRONTEND_BASE_URL}login/?verify=error&detail={message['message']}',
+                                status_code=status.HTTP_302_FOUND)
+
+    user_id = int(message['token'][0]['id'])
+
+    user = await UserService.get_user(session, {'id': user_id, 'is_verified': True})
+    if user:
+        message = 'UserAlreadyActivated'
+        return RedirectResponse(url=f'{settings.FRONTEND_BASE_URL}login/?verify=error&detail={message}',
+                                status_code=status.HTTP_302_FOUND)
 
     await UserService.verified_user(session, int(message['token'][0]['id']))
-    return RedirectResponse(url=f'{settings.FRONTEND_BASE_URL}login', status_code=status.HTTP_302_FOUND)
+    return RedirectResponse(url=f'{settings.FRONTEND_BASE_URL}login/?verify=success', status_code=status.HTTP_302_FOUND)

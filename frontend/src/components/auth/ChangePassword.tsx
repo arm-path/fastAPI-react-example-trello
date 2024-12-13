@@ -33,7 +33,7 @@ const ChangePassword = () => {
     const form = useAppSelector(state => state.auth.resetPasswordForm)
 
     const dispatch = useAppDispatch()
-    
+
     return (
         <div className={classes.container}>
             <div className={classes.formContainer}>

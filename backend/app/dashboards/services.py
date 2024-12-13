@@ -95,7 +95,7 @@ class DashboardService(DatabaseService):
         current_dashboard = await cls.get_dashboard(session, user, project_id, dashboard_id)
 
         if current_dashboard.index == index:
-            return await cls.get_dashboard(session, user, project_id, dashboard_id)
+            return await cls.get_dashboards(session, user, project_id)
 
         total_dashboards = await session.execute(
             select(func.count()).where(cls.model.project_id == project_id)

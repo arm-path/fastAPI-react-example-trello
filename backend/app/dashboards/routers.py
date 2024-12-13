@@ -3,8 +3,10 @@ from typing import Annotated, List
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.dashboards.schemas import DashboardCreateSchema, DashboardUpdateSchema, DashboardReadSchema, \
-    DashboardMovingSchema
+from app.dashboards.schemas import (DashboardCreateSchema,
+                                    DashboardUpdateSchema,
+                                    DashboardReadSchema,
+                                    DashboardMovingSchema)
 from app.dashboards.services import DashboardService
 from app.database import db_settings
 from app.authentication.dependencies import current_user
