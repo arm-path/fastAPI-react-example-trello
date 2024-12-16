@@ -11,8 +11,8 @@ import projectAPI, {
     UpdateResponseType
 } from '../../api/projectAPI.ts'
 import {ThunkApiConfig} from '../store'
-import validateEmail from '../../utils/validations/validateEmail.ts';
-import {APIBaseErrorType} from '../../api/api.ts';
+import validateEmail from '../../utils/validations/validateEmail.ts'
+import {APIBaseErrorType} from '../../api/api.ts'
 
 
 type InitialState = {
@@ -27,6 +27,7 @@ type InitialState = {
     }
     createForm: CreateForm
     updateForm: UpdateForm
+    deleteErrorMsg: string
     detail: ProjectDetailType | null
     showSettingsDetail: boolean
     loading: boolean
@@ -66,6 +67,7 @@ const initialState: InitialState = {
         error: '',
         loading: false
     },
+    deleteErrorMsg: '',
     detail: null,
     showSettingsDetail: false,
     loading: false,
@@ -109,13 +111,21 @@ export const getProjectThunk = createAsyncThunk<AxiosResponse<ProjectDetailType>
     }
 )
 
+type deleteProjectResponseType = {
+    response: AxiosResponse | undefined
+    detail: number
+}
+
 export const deleteProjectThunk = createAsyncThunk<
-    AxiosResponse | undefined, number | undefined>
+    deleteProjectResponseType, number | undefined>
 (
     'project/delete',
     async (projectID) => {
-        if (projectID) return await ProjectAPI.delete(projectID)
-        return undefined
+        if (projectID) {
+            const response = await ProjectAPI.delete(projectID)
+            return {response: response, detail: projectID}
+        }
+        return {response: undefined, detail: 0}
     }
 )
 
@@ -323,7 +333,16 @@ const projectSlice = createSlice({
                 state.inviteUserForm.loading = false
             })
             .addCase(deleteProjectThunk.fulfilled, (state, action) => {
-                //         TODO: Redirect after delete
+                if (action.payload) {
+                    if (!action.payload.response) state.deleteErrorMsg = 'Запрос на удаление не быд отправлен.'
+                    if (action.payload.response && action.payload.response.status === 204) {
+                        state.deleteErrorMsg = ''
+                        state.detail = null
+                        state.list = state.list.filter(el => el.id != action.payload.detail)
+                    }else if (action.payload.response && action.payload.response.status === 422) {
+                        state.deleteErrorMsg = 'Произошла ошибка валидации данных.'
+                    }
+                }
             })
     }
 })

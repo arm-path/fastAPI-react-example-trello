@@ -1,4 +1,5 @@
 import {useState} from 'react'
+import {useNavigate} from 'react-router-dom'
 
 import classes from './Settings.module.css'
 import Modal from '../../auxiliary/Modal.tsx'
@@ -10,21 +11,28 @@ import {BaseInvitationType} from '../../../api/projectAPI.ts'
 import ConfirmDeleteModal from './ConfirmDeleteModal.tsx'
 
 
+
 const SettingsProject = () => {
 
     const [confirmationModal, setConfirmationModal] = useState<'invitedUser' | 'project' | null>(null)
     const [invitation, setInvitation] = useState<BaseInvitationType | null>(null)
     const projectId = useAppSelector(state => state.projects.detail?.id)
+    const errorDeleteMsg = useAppSelector(state => state.projects.deleteErrorMsg)
 
     const dispatch = useAppDispatch()
-
+    const navigate = useNavigate()
 
     const invitedUsers = useAppSelector(state => {
         return state.projects.detail?.invitations
     })
 
-    const deleteProjectHandler = () => {
-        dispatch(deleteProjectThunk(projectId))
+    const  deleteProjectHandler = async () => {
+        const action  = await dispatch(deleteProjectThunk(projectId))
+        if (deleteProjectThunk.fulfilled.match(action)) {
+            if (action.payload && action.payload.response && action.payload.response.status === 204) {
+                navigate('/projects');
+            }
+        }
     }
 
     return (
@@ -32,6 +40,7 @@ const SettingsProject = () => {
                closeHandler={() => dispatch(setShowSettingsDetailAC(false))}>
             <div>
                 <h3 className={classes.header}>Настройки проекта</h3>
+                {errorDeleteMsg &&<div className={classes.errorAlert}>{errorDeleteMsg}</div>}
                 <div>
                     <InviteInProject/>
                 </div>

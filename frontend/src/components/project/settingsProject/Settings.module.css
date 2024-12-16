@@ -32,6 +32,12 @@
     color: #45a049;
 }
 
+.errorAlert {
+    padding: 7px;
+    background-color: #c31122;
+    color: #ffffff;
+}
+
 .invitedUsersTable {
     border-collapse: collapse;
     border: 1px solid rgb(140 140 140);

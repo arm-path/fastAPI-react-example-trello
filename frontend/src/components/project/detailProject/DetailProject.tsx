@@ -14,7 +14,6 @@ import SettingsProject from '../settingsProject/SettingsProject.tsx'
 const DetailProject = () => {
     const params = useParams()
     const dispatch = useAppDispatch()
-
     const project = useAppSelector(state => state.projects.detail)
     const projectLoading = useAppSelector(state => state.projects.loading)
     const dashboards = useAppSelector(state => state.dashboard.list)
@@ -39,7 +38,7 @@ const DetailProject = () => {
     useEffect(() => {
         dispatch(getDashboards(Number(params.projectID)))
         dispatch(getProjectThunk(Number(params.projectID)))
-    }, [])
+    }, [params.projectID, dispatch])
 
     const task = useAppSelector((state) => state.tasks.detail)
 
@@ -53,9 +52,10 @@ const DetailProject = () => {
                     {!project ? <NotFound/>
                         : <div className={classes.container} onClick={handleClick}
                                style={{cursor: dashboardEdit.loading || movingLoading ? 'wait' : 'default'}}>
-                            <div className={classes.settings} onClick={()=> {
+                            <div className={classes.settings} onClick={() => {
                                 dispatch(setShowSettingsDetailAC(true))
-                            }}> Настройки </div>
+                            }}> Настройки
+                            </div>
                             <h3 className={classes.title}>Панели задач <br/> ( {project.title} ) </h3>
                             <div className={error && classes.error}>{error}</div>
                             <div className={classes.dashboards}>
