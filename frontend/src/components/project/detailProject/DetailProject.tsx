@@ -1,7 +1,15 @@
-import {useParams} from 'react-router-dom'
 import React, {useEffect} from 'react'
+import {useParams} from 'react-router-dom'
+
 import classes from './DetailProject.module.css'
-import {getDashboards, setEditDashboardAC, updateDashboard} from '../../../redux/reducers/dashboardReducer.ts'
+import deleteIcon from '../../../assets/images/delete.png'
+import {
+    deleteDashboard,
+    editMovingElement,
+    getDashboards,
+    setEditDashboardAC,
+    updateDashboard
+} from '../../../redux/reducers/dashboardReducer.ts'
 import {useAppDispatch, useAppSelector} from '../../../redux/hooks.ts'
 import Dashboard from './dashboard/Dashboard.tsx'
 import {getProjectThunk, setShowSettingsDetailAC} from '../../../redux/reducers/projectReducer.ts'
@@ -10,6 +18,7 @@ import NotFound from '../../auxiliary/NotFound.tsx'
 import DashboardCreate from './dashboard/DashboardCreate.tsx'
 import TaskDetail from './dashboard/task/TaskDetail.tsx'
 import SettingsProject from '../settingsProject/SettingsProject.tsx'
+import DragAndDrop from '../../auxiliary/DragAndDrop.tsx';
 
 const DetailProject = () => {
     const params = useParams()
@@ -57,6 +66,13 @@ const DetailProject = () => {
                             }}> Настройки
                             </div>
                             <h3 className={classes.title}>Панели задач <br/> ( {project.title} ) </h3>
+                            <div className={classes.deleteBasket}>
+                                <DragAndDrop obj={{id: -1}}
+                                             setMovingElement={editMovingElement}
+                                             setIndexElement={deleteDashboard}>
+                                    <img className={classes.deleteBasketImg} src={deleteIcon} alt='delete'/>
+                                </DragAndDrop>
+                            </div>
                             <div className={error && classes.error}>{error}</div>
                             <div className={classes.dashboards}>
                                 <DashboardCreate/>

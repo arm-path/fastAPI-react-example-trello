@@ -58,6 +58,14 @@ const dashboardAPI = {
         return await instance.put<AxiosResponse<Array<DashboardListType>>>(`${projectID}/moving/${dashboardID}/`, {index}, {headers: this.headers})
             .then(response => response)
             .catch(error => error)
+    },
+    async delete(projectID: number, dashboardID: number): Promise<AxiosResponse> {
+        return await instance.delete<AxiosResponse<Array<DashboardListType>>>(
+            `${projectID}/delete/${dashboardID}/`,
+            {headers: this.headers}
+        )
+            .then(response => response)
+            .catch(error => error.response)
     }
 }
 

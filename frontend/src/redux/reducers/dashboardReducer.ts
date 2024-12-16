@@ -79,6 +79,15 @@ export const createDashboard = createAsyncThunk<AxiosResponse<Array<DashboardLis
     }
 )
 
+export const deleteDashboard = createAsyncThunk<
+    AxiosResponse<Array<DashboardListType>> | undefined, DashboardType>
+(
+    'dashboard/delete',
+    async (obj: DashboardType) => {
+        return await DashboardAPI.delete(obj.project_id, obj.id)
+    }
+)
+
 
 export const movingDashboard = createAsyncThunk<AxiosResponse<Array<DashboardListType>> | undefined, DashboardType, ThunkApiConfig>
 (
@@ -183,6 +192,14 @@ const dashboardSlice = createSlice({
                 }
                 state.moving.id = null
                 state.moving.loading = false
+            })
+
+            .addCase(deleteDashboard.fulfilled, (state, action) => {
+                if (action.payload) {
+                    if (action.payload.status === 200) {
+                        state.list = action.payload.data
+                    }
+                }
             })
     }
 })

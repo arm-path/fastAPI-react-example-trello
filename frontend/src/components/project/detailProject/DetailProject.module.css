@@ -54,3 +54,11 @@
 .settingsActive {
     color: #744cb5;
 }
+
+.deleteBasket {
+    text-align: right;
+}
+
+.deleteBasketImg {
+    max-width: 70px;
+}

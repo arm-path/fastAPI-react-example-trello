@@ -2,10 +2,14 @@ import {DragEvent, ReactNode} from 'react'
 import classes from './DragAndDrop.module.css'
 import {useAppDispatch} from '../../redux/hooks.ts'
 import {ActionCreatorWithPayload} from '@reduxjs/toolkit'
-import {DashboardType, TaskType} from '../../api/dashboardAPI.ts';
+import {DashboardType, TaskType} from '../../api/dashboardAPI.ts'
 
 
-type ObjectType = DashboardType | TaskType
+type DashboardBasketType = {
+    id: -1
+}
+
+type ObjectType = DashboardType | TaskType | DashboardBasketType
 
 type MovingElementAC = (ActionCreatorWithPayload<number, 'dashboardSlice/editMovingElement'>
     | ActionCreatorWithPayload<number, 'task/editMovingTask'>)
@@ -19,18 +23,38 @@ type PropsType = {
 
 
 const DragAndDrop = (props: PropsType) => {
+
     const dispatch = useAppDispatch()
 
     const onDragStartHandler = (e: DragEvent<HTMLDivElement>, el: ObjectType) => {
-        const target = e.target as HTMLElement;
-        target.style.background = '#9f9d9d'
-        dispatch(props.setMovingElement(el.id))
+        e.dataTransfer.setData('text/plain', JSON.stringify(el))
+        if (el.id !== -1) {
+            const target = e.target as HTMLElement;
+            target.style.background = '#9f9d9d'
+            dispatch(props.setMovingElement(el.id))
+        } else {
+            e.preventDefault()
+            return
+        }
+
     }
 
     const onDragDropHandler = (e: DragEvent<HTMLDivElement>, el: ObjectType) => {
         e.preventDefault()
-        dispatch(props.setIndexElement(el))
-        return undefined
+        const draggedData = e.dataTransfer.getData('text/plain')
+        const draggedObject: ObjectType = JSON.parse(draggedData)
+        if (el.id === -1) {
+            if ('project_id' in draggedObject) {
+                dispatch(props.setIndexElement(draggedObject))
+                return undefined
+            }else{
+                return undefined
+            }
+        } else {
+            dispatch(props.setIndexElement(el))
+            return undefined
+        }
+
     }
 
     const onDragOverHandler = (e: DragEvent<HTMLDivElement>) => {
