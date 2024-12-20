@@ -1,5 +1,5 @@
 import React, {useEffect} from 'react'
-import {NavLink, useLocation} from 'react-router-dom'
+import {NavLink, useLocation, useNavigate} from 'react-router-dom'
 
 import classes from './auth.module.css'
 import Input from '../form/input/Input.tsx'
@@ -12,16 +12,27 @@ import {
 } from '../../redux/reducers/authReducer.ts'
 import Button from '../form/button/Button.tsx'
 import {useAppDispatch, useAppSelector} from '../../redux/hooks.ts'
-import {activateUserError} from '../../utils/changeBackendError.ts';
+import {activateUserError} from '../../utils/changeBackendError.ts'
+import {selectAuth} from '../../redux/selectors.ts'
 
 
 const Login = () => {
-    const form = useAppSelector(state => state.auth.form)
+
+    const navigate = useNavigate()
+
+    const {form} = useAppSelector(selectAuth)
     const dispatch = useAppDispatch()
+
+    const getAuthResponse = async () => {
+        const action = await dispatch(authThunk())
+        if (authThunk.fulfilled.match(action)) {
+            if (action.payload && action.payload && action.payload.status === 200) navigate('/projects');
+        }
+    }
 
     useEffect(() => {
         dispatch(clearFormAC())
-    }, []);
+    }, [dispatch]);
 
     const location = useLocation()
     const queryParams = new URLSearchParams(location.search)
@@ -68,9 +79,8 @@ const Login = () => {
                 <Button type='button'
                         title='Авторизация'
                         style='success'
-                        onClickHandler={() => dispatch(authThunk())}
+                        onClickHandler={getAuthResponse}
                 />
-
             </div>
         </div>
     )
