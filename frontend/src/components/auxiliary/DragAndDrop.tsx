@@ -23,12 +23,11 @@ type PropsType = {
 
 
 const DragAndDrop = (props: PropsType) => {
-
     const dispatch = useAppDispatch()
 
     const onDragStartHandler = (e: DragEvent<HTMLDivElement>, el: ObjectType) => {
-        e.dataTransfer.setData('text/plain', JSON.stringify(el))
         if (el.id !== -1) {
+            e.dataTransfer.setData('text', JSON.stringify(el))
             const target = e.target as HTMLElement;
             target.style.background = '#9f9d9d'
             dispatch(props.setMovingElement(el.id))
@@ -47,11 +46,17 @@ const DragAndDrop = (props: PropsType) => {
             if ('project_id' in draggedObject) {
                 dispatch(props.setIndexElement(draggedObject))
                 return undefined
-            }else{
+            } else {
                 return undefined
             }
         } else {
-            dispatch(props.setIndexElement(el))
+            if (('project_id' in draggedObject && 'project_id' in el)
+                ||
+                ('dashboard_id' in draggedObject && 'dashboard_id' in el)) {
+                dispatch(props.setIndexElement(el))
+                e.dataTransfer.effectAllowed = 'move'
+            }
+
             return undefined
         }
 
@@ -59,9 +64,9 @@ const DragAndDrop = (props: PropsType) => {
 
     const onDragOverHandler = (e: DragEvent<HTMLDivElement>) => {
         e.preventDefault()
-        const target = e.target as HTMLElement;
-        target.style.background = '#f9f9f9'
 
+        const target = e.target as HTMLElement;
+        target.style.background = '#ffffff';
     }
 
     const onDragLeaveHandler = (e: DragEvent<HTMLDivElement>) => {
@@ -88,7 +93,6 @@ const DragAndDrop = (props: PropsType) => {
              }}
              onDragOver={(e: DragEvent<HTMLDivElement>) => {
                  onDragOverHandler(e)
-
              }}
              onDrop={(e: DragEvent<HTMLDivElement>) => {
                  onDragDropHandler(e, props.obj)

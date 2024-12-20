@@ -77,7 +77,9 @@ export const getProjects = createAsyncThunk<AxiosResponse<ListProjectType>>
 (
     'project/list',
     async () => {
-        return await ProjectAPI.list()
+        const response = await ProjectAPI.list()
+        console.log(response)
+        return response
     }
 )
 
@@ -339,7 +341,7 @@ const projectSlice = createSlice({
                         state.deleteErrorMsg = ''
                         state.detail = null
                         state.list = state.list.filter(el => el.id != action.payload.detail)
-                    }else if (action.payload.response && action.payload.response.status === 422) {
+                    } else if (action.payload.response && action.payload.response.status === 422) {
                         state.deleteErrorMsg = 'Произошла ошибка валидации данных.'
                     }
                 }

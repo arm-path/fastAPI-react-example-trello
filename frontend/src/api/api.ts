@@ -1,3 +1,5 @@
+import Cookies from 'js-cookie';
+
 export type APIResponseType<D = {}> = {
     status: number
     data: D
@@ -17,6 +19,10 @@ type BaseErrorType = {
 
 export type APIBaseErrorType = {
     detail: BaseErrorType
+}
+
+export const getHeader = () => {
+    return {'Authorization': 'Bearer ' + Cookies.get('access_token')}
 }
 
 export const baseUrl = 'http://localhost:8000/'
