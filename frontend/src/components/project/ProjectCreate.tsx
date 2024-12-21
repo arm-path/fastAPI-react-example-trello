@@ -6,11 +6,12 @@ import Button from '../form/button/Button.tsx'
 import ButtonLoading from '../form/button/ButtonLoading.tsx'
 import {changeTitleCreateProjectAC, createProjectThunk} from '../../redux/reducers/projectReducer.ts'
 import {useAppDispatch, useAppSelector} from '../../redux/hooks.ts'
+import {selectProjects} from '../../redux/selectors.ts'
 
 const ProjectCreate = () => {
 
     const dispatch = useAppDispatch()
-    const form = useAppSelector(state => state.projects.createForm)
+    const {createForm: form} = useAppSelector(selectProjects)
 
     return (
         <div>

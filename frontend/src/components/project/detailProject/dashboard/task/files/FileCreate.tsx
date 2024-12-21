@@ -5,6 +5,7 @@ import Input from '../../../../../form/input/Input.tsx'
 import Button from '../../../../../form/button/Button.tsx'
 import {editFileValue, loadFileThunk} from '../../../../../../redux/reducers/taskReducer.ts'
 import {useAppDispatch, useAppSelector} from '../../../../../../redux/hooks.ts'
+import {selectTask} from '../../../../../../redux/selectors.ts'
 
 
 type PropsType = {
@@ -13,9 +14,9 @@ type PropsType = {
 
 const FileCreate = (props: PropsType) => {
 
-    const [formData, setFormData] = useState(new FormData());
-    const fileValue = useAppSelector(state => state.tasks.files.value)
+    const [formData, setFormData] = useState(new FormData())
 
+    const {addingFileToTaskForm: form} = useAppSelector(selectTask)
     const dispatch = useAppDispatch()
 
     return (
@@ -24,7 +25,7 @@ const FileCreate = (props: PropsType) => {
             <div className={classes.filesAddContainer}>
                 <Input type='file'
                        placeholder='Файл'
-                       value={fileValue}
+                       value={form.value}
                        onchangeHandler={(e: ChangeEvent<HTMLInputElement>) => {
                            if (e.target.files?.[0]) {
                                formData.append('file', e.target.files[0]);

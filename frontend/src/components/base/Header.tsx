@@ -1,11 +1,13 @@
 import {NavLink} from 'react-router-dom'
+
 import classes from './header.module.css'
-import {useAppSelector} from '../../redux/hooks.ts';
+import {useAppSelector} from '../../redux/hooks.ts'
+import {selectApp} from '../../redux/selectors.ts'
 
 
 const Header = () => {
 
-    const isAuth = useAppSelector(state => state.app.isAuth)
+    const {isAuth} = useAppSelector(selectApp)
 
     return (
         <div className={classes.container}>

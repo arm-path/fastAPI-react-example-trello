@@ -1,10 +1,12 @@
 import {useEffect} from 'react'
+
+import withAuthRedirect from '../hoc/Authentication.tsx'
 import {useAppDispatch, useAppSelector} from '../../redux/hooks.ts'
 import {logoutThunk} from '../../redux/reducers/authReducer.ts'
-import withAuthRedirect from '../hoc/Authentication.tsx'
+import {selectApp} from '../../redux/selectors.ts'
 
 const Logout = () => {
-    const isAuth = useAppSelector(state => state.app.isAuth)
+    const {isAuth} = useAppSelector(selectApp)
     const dispatch = useAppDispatch()
 
     useEffect(() => {

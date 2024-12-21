@@ -5,20 +5,25 @@ import classes from './auth.module.css'
 import Input from '../form/input/Input.tsx'
 import Button from '../form/button/Button.tsx'
 import {useAppDispatch, useAppSelector} from '../../redux/hooks.ts'
-import {resetPasswordThunk} from '../../redux/reducers/authReducer.ts';
+import {resetPasswordThunk} from '../../redux/reducers/authReducer.ts'
+import {selectAuth} from '../../redux/selectors.ts'
 
 
 const ChangePassword = () => {
     const params = useParams()
+
     const [password, setPassword] = useState('')
     const [passwordRepeat, setPasswordRepeat] = useState('')
-
     const [error, setError] = useState('')
+
+    const {resetPasswordForm: form} = useAppSelector(selectAuth)
+    const dispatch = useAppDispatch()
 
     const setPasswordHandler = (e: ChangeEvent<HTMLInputElement>) => {
         if (error) setError('')
         setPassword(e.target.value)
     }
+
     const setPasswordRepeatHandler = (e: ChangeEvent<HTMLInputElement>) => {
         if (error) setError('')
         setPasswordRepeat(e.target.value)
@@ -30,9 +35,7 @@ const ChangePassword = () => {
         }
     }
 
-    const form = useAppSelector(state => state.auth.resetPasswordForm)
 
-    const dispatch = useAppDispatch()
 
     return (
         <div className={classes.container}>

@@ -5,6 +5,7 @@ import {changeEditDashboardAC, setEditDashboardAC} from '../../../../redux/reduc
 import Input from '../../../form/input/Input.tsx'
 import {useAppDispatch, useAppSelector} from '../../../../redux/hooks.ts'
 import {DashboardListType} from '../../../../api/dashboardAPI.ts'
+import {selectDashboard} from '../../../../redux/selectors.ts';
 
 
 type DashboardUpdatePropsType = {
@@ -14,9 +15,10 @@ type DashboardUpdatePropsType = {
 const DashboardUpdate = (props: DashboardUpdatePropsType) => {
     const {data} = props
 
-    const editEl = useAppSelector(state => state.dashboard.editDashboard)
-    const edit = editEl.id === data.id
+    const {editDashboard: editEl} = useAppSelector(selectDashboard)
     const dispatch = useAppDispatch()
+
+    const edit = editEl.id === data.id
 
     return (
         <div>

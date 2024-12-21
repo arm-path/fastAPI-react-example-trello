@@ -4,7 +4,6 @@ import {NavLink} from 'react-router-dom'
 import classes from './auth.module.css'
 import Input from '../form/input/Input.tsx'
 import Button from '../form/button/Button.tsx'
-
 import {useAppDispatch, useAppSelector} from '../../redux/hooks.ts'
 import {
     changeEmailFormAC,
@@ -14,14 +13,18 @@ import {
     clearFormAC,
     registerThunk
 } from '../../redux/reducers/authReducer.ts'
+import {selectAuth} from '../../redux/selectors.ts'
 
 
 const Register = () => {
-    const form = useAppSelector(state => state.auth.form)
+
+    const {form} = useAppSelector(selectAuth)
     const dispatch = useAppDispatch()
+
     useEffect(() => {
         dispatch(clearFormAC())
-    }, []);
+    }, [])
+
     return (
         <div className={classes.container}>
             <div className={classes.formContainer}>

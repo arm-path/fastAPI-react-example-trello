@@ -6,6 +6,7 @@ import {deleteFileThunk} from '../../../../../../redux/reducers/taskReducer.ts'
 import getIcons from '../../../../../../utils/getIcon.ts'
 import {TaskFilesType} from '../../../../../../api/taskAPI.ts'
 import {useAppDispatch, useAppSelector} from '../../../../../../redux/hooks.ts';
+import {selectApp} from '../../../../../../redux/selectors.ts';
 
 
 type PropsType = {
@@ -19,7 +20,8 @@ const FileDetail = (props: PropsType) => {
     const task = props.task
 
     const [showImage, setShowImage] = useState(0)
-    const baseUrl = useAppSelector(state => state.app.baseUrl)
+
+    const {baseUrl} = useAppSelector(selectApp)
     const dispatch = useAppDispatch()
 
     return (

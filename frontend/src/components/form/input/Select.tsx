@@ -5,7 +5,7 @@ import {useAppDispatch} from '../../../redux/hooks.ts';
 
 type SelectProps = {
     placeholder: string
-    options: Array<{ value: string; label: string }>
+    options: Array<{ value: number; label: string }>
     onChangeHandler: any
 }
 

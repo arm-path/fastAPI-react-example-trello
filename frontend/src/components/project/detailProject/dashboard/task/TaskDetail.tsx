@@ -8,6 +8,7 @@ import Input from '../../../../form/input/Input.tsx'
 import TaskResponsible from './TaskResponsible.tsx'
 import Files from './files/Files.tsx';
 import Modal from '../../../../auxiliary/Modal.tsx'
+import {selectTask} from '../../../../../redux/selectors.ts'
 
 
 type PropsType = {
@@ -17,9 +18,7 @@ type PropsType = {
 const TaskDetail = (props: PropsType) => {
     const {task} = props
 
-    const edit = useAppSelector(state => state.tasks.editDetail)
-    const loading = useAppSelector(state => state.tasks.editDetailLoading)
-    const error = useAppSelector(state => state.tasks.editDetailError)
+    const {editDetail: edit, editDetailLoading: loading, editDetailError: error} = useAppSelector(selectTask)
     const dispatch = useAppDispatch()
 
     const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {

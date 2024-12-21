@@ -6,10 +6,11 @@ import {changeTitleCreateDashboard, createDashboard} from '../../../../redux/red
 import ButtonLoading from '../../../form/button/ButtonLoading.tsx'
 import Button from '../../../form/button/Button.tsx'
 import {useAppDispatch, useAppSelector} from '../../../../redux/hooks.ts'
+import {selectDashboard} from '../../../../redux/selectors.ts'
 
 const DashboardCreate = () => {
 
-    const form = useAppSelector(state => state.dashboard.formDashboard)
+    const {formDashboard: form} = useAppSelector(selectDashboard)
     const dispatch = useAppDispatch()
 
     return (

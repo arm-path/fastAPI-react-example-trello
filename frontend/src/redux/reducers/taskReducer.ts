@@ -26,7 +26,7 @@ type InitialState = {
     editDetail: EditDetailType | null
     editDetailLoading: boolean
     editDetailError: string
-    files: {
+    addingFileToTaskForm: {
         value: FormData | File | null
     }
 }
@@ -42,7 +42,7 @@ const initialState: InitialState = {
     editDetail: null,
     editDetailLoading: false,
     editDetailError: '',
-    files: {
+    addingFileToTaskForm: {
         value: null
     }
 }
@@ -143,7 +143,7 @@ export const loadFileThunk = createAsyncThunk<
 (
     'task/loadFile',
     async (task_id, thunkAPI) => {
-        const file: FormData | File | null = thunkAPI.getState().tasks.files.value
+        const file: FormData | File | null = thunkAPI.getState().tasks.addingFileToTaskForm.value
         if (!file) return undefined
         return FilesAPI.load(task_id, file)
 
@@ -187,7 +187,7 @@ const taskSlice = createSlice({
             state.editDetailError = ''
         },
         editFileValue(state, action: PayloadAction<FormData | File | null>) {
-            state.files.value = action.payload
+            state.addingFileToTaskForm.value = action.payload
         }
 
     },

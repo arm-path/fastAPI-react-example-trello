@@ -1,9 +1,9 @@
 import axios, {AxiosResponse} from 'axios'
 import qs from 'qs'
-import {APIAuthErrorType, APIResponseType, APIValidationErrorType} from './api.ts'
+import {APIAuthErrorType, APIResponseType, APIValidationErrorType, baseUrl} from './api.ts'
 
 const instance = axios.create({
-    baseURL: 'http://localhost:8000/auth',
+    baseURL: `${baseUrl}auth`,
     withCredentials: true,
 })
 

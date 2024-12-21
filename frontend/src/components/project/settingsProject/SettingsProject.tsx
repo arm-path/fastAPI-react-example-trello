@@ -3,34 +3,30 @@ import {useNavigate} from 'react-router-dom'
 
 import classes from './Settings.module.css'
 import Modal from '../../auxiliary/Modal.tsx'
-import {deleteProjectThunk, deleteUserThunk, setShowSettingsDetailAC} from '../../../redux/reducers/projectReducer.ts'
-import {useAppDispatch, useAppSelector} from '../../../redux/hooks.ts'
 import InviteInProject from './InviteInProject.tsx'
 import InvitedUsers from './InvitedUsers.tsx'
-import {BaseInvitationType} from '../../../api/projectAPI.ts'
 import ConfirmDeleteModal from './ConfirmDeleteModal.tsx'
-
+import {useAppDispatch, useAppSelector} from '../../../redux/hooks.ts'
+import {deleteProjectThunk, deleteUserThunk, setShowSettingsDetailAC} from '../../../redux/reducers/projectReducer.ts'
+import {selectProjects} from '../../../redux/selectors.ts'
+import {BaseInvitationType} from '../../../api/projectAPI.ts'
 
 
 const SettingsProject = () => {
 
-    const [confirmationModal, setConfirmationModal] = useState<'invitedUser' | 'project' | null>(null)
-    const [invitation, setInvitation] = useState<BaseInvitationType | null>(null)
-    const projectId = useAppSelector(state => state.projects.detail?.id)
-    const errorDeleteMsg = useAppSelector(state => state.projects.deleteErrorMsg)
-
-    const dispatch = useAppDispatch()
     const navigate = useNavigate()
 
-    const invitedUsers = useAppSelector(state => {
-        return state.projects.detail?.invitations
-    })
+    const [confirmationModal, setConfirmationModal] = useState<'invitedUser' | 'project' | null>(null)
+    const [invitation, setInvitation] = useState<BaseInvitationType | null>(null)
 
-    const  deleteProjectHandler = async () => {
-        const action  = await dispatch(deleteProjectThunk(projectId))
+    const {detail: project, deleteErrorMsg: errorDeleteMsg} = useAppSelector(selectProjects)
+    const dispatch = useAppDispatch()
+
+    const deleteProjectHandler = async () => {
+        const action = await dispatch(deleteProjectThunk(project?.id))
         if (deleteProjectThunk.fulfilled.match(action)) {
             if (action.payload && action.payload.response && action.payload.response.status === 204) {
-                navigate('/projects');
+                navigate('/projects')
             }
         }
     }
@@ -40,7 +36,7 @@ const SettingsProject = () => {
                closeHandler={() => dispatch(setShowSettingsDetailAC(false))}>
             <div>
                 <h3 className={classes.header}>Настройки проекта</h3>
-                {errorDeleteMsg &&<div className={classes.errorAlert}>{errorDeleteMsg}</div>}
+                {errorDeleteMsg && <div className={classes.errorAlert}>{errorDeleteMsg}</div>}
                 <div>
                     <InviteInProject/>
                 </div>
@@ -56,7 +52,7 @@ const SettingsProject = () => {
                         </tr>
                         </thead>
                         <tbody>
-                        {invitedUsers?.map(el => {
+                        {project && project.invitations.map(el => {
                             return <InvitedUsers
                                 key={el.id}
                                 invitation={el}
@@ -77,7 +73,7 @@ const SettingsProject = () => {
                                 title={`Вы уверены что хотите удалить пользователя: ${invitation.user.email}?`}
                                 deleteHandler={() => {
                                     dispatch(deleteUserThunk({
-                                        projectId: projectId,
+                                        projectId: project?.id,
                                         invitationId: invitation.id
                                     }))
                                 }

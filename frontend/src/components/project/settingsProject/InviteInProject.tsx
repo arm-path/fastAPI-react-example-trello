@@ -1,14 +1,15 @@
+import {ChangeEvent} from 'react'
+
 import classes from './Settings.module.css'
 import Input from '../../form/input/Input.tsx'
 import Button from '../../form/button/Button.tsx'
 import {useAppDispatch, useAppSelector} from '../../../redux/hooks.ts'
-import {ChangeEvent} from 'react';
 import {changeInviteUserForm, checkInviteUserEmail, inviteUserThunk} from '../../../redux/reducers/projectReducer.ts'
+import {selectProjects} from '../../../redux/selectors.ts'
 
 const InviteInProject = () => {
 
-    const form = useAppSelector(state => state.projects.inviteUserForm)
-
+    const {inviteUserForm: form} = useAppSelector(selectProjects)
     const dispatch = useAppDispatch()
 
     return (

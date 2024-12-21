@@ -1,11 +1,11 @@
 import axios, {AxiosResponse} from 'axios'
 
 import {BaseUserType} from './userAPI'
-import {APIAuthErrorType, APIBaseErrorType, APIValidationErrorType, getHeader} from './api.ts'
+import {APIAuthErrorType, APIBaseErrorType, APIValidationErrorType, baseUrl, getHeader} from './api.ts'
 
 
 const instance = axios.create({
-    baseURL: 'http://localhost:8000/project/',
+    baseURL: `${baseUrl}project/`,
     withCredentials: true,
 })
 
@@ -44,7 +44,6 @@ export type UpdateErrorResponseType = APIValidationErrorType | APIAuthErrorType
 export type UpdateResponseType = ProjectType | APIValidationErrorType | APIAuthErrorType | APIBaseErrorType
 
 const projectAPI = {
-
     async create(title: string): Promise<AxiosResponse> {
         return await instance.post<AxiosResponse<CreateResponseType>>('create/', {title}, {headers: getHeader()})
             .then(response => response)

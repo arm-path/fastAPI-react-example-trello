@@ -5,12 +5,14 @@ import Input from '../form/input/Input.tsx'
 import Button from '../form/button/Button.tsx'
 import {forgotPasswordThunk} from '../../redux/reducers/authReducer.ts'
 import {useAppDispatch, useAppSelector} from '../../redux/hooks.ts'
+import {selectAuth} from '../../redux/selectors.ts'
 
 
 const ForgotPassword = () => {
 
     const [email, setEmail] = useState('')
-    const form = useAppSelector(state => state.auth.forgotPasswordForm)
+
+    const {forgotPasswordForm: form} = useAppSelector(selectAuth)
     const dispatch = useAppDispatch()
 
     let styleContainerForm = classes.formContainer

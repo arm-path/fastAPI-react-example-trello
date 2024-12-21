@@ -18,17 +18,16 @@ import NotFound from '../../auxiliary/NotFound.tsx'
 import DashboardCreate from './dashboard/DashboardCreate.tsx'
 import TaskDetail from './dashboard/task/TaskDetail.tsx'
 import SettingsProject from '../settingsProject/SettingsProject.tsx'
-import DragAndDrop from '../../auxiliary/DragAndDrop.tsx';
+import DragAndDrop from '../../auxiliary/DragAndDrop.tsx'
+import {selectDashboard, selectProjects} from '../../../redux/selectors.ts'
 
 const DetailProject = () => {
     const params = useParams()
+
     const dispatch = useAppDispatch()
-    const project = useAppSelector(state => state.projects.detail)
-    const projectLoading = useAppSelector(state => state.projects.loading)
-    const dashboards = useAppSelector(state => state.dashboard.list)
-    const dashboardEdit = useAppSelector(state => state.dashboard.editDashboard)
-    const error = useAppSelector(state => state.dashboard.error)
-    const movingLoading = useAppSelector(state => state.dashboard.moving.loading)
+    const {detail: project, loading: projectLoading} = useAppSelector(selectProjects)
+    const {list: dashboards, editDashboard: dashboardEdit, error, moving} = useAppSelector(selectDashboard)
+
 
     const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
         const target = event.target as HTMLElement;
@@ -60,7 +59,7 @@ const DetailProject = () => {
                 : <>
                     {!project ? <NotFound/>
                         : <div className={classes.container} onClick={handleClick}
-                               style={{cursor: dashboardEdit.loading || movingLoading ? 'wait' : 'default'}}>
+                               style={{cursor: dashboardEdit.loading || moving.loading ? 'wait' : 'default'}}>
                             <div className={classes.settings} onClick={() => {
                                 dispatch(setShowSettingsDetailAC(true))
                             }}> Настройки

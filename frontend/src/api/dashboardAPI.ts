@@ -1,6 +1,6 @@
 import axios, {AxiosResponse} from 'axios'
 import {BaseUserType} from './userAPI.ts';
-import Cookies from 'js-cookie';
+import {getHeader} from './api.ts';
 
 
 const instance = axios.create({
@@ -32,37 +32,39 @@ export type DashboardListType = DashboardType & {
 }
 
 const dashboardAPI = {
-    headers: {'Authorization': 'Bearer ' + Cookies.get('access_token')},
     async list(projectID: number): Promise<AxiosResponse> {
-        return await instance.get<AxiosResponse<Array<DashboardListType>>>(`${projectID}/list/`, {headers: this.headers})
+        return await instance.get<AxiosResponse<Array<DashboardListType>>>(`${projectID}/list/`, {headers: getHeader()})
             .then((response) => response)
-            .catch(error => error)
+            .catch(error => error.response)
     },
     async update(projectID: number, dashboardID: number, title: string): Promise<AxiosResponse> {
         return await instance.put<AxiosResponse<DashboardListType>>(`${projectID}/update/${dashboardID}/`, {
             title: title,
             color: ''
-        }, {headers: this.headers})
+        }, {headers: getHeader()})
             .then(response => response)
-            .catch(error => error)
+            .catch(error => error.response)
     },
     async create(projectID: number, title: string): Promise<AxiosResponse> {
         return await instance.post<AxiosResponse<DashboardListType>>(`${projectID}/create/`, {
             title: title,
             color: ''
-        }, {headers: this.headers})
+        }, {headers: getHeader()})
             .then(response => response)
-            .catch(error => error)
+            .catch(error => error.response)
     },
     async moving(projectID: number, dashboardID: number, index: number): Promise<AxiosResponse> {
-        return await instance.put<AxiosResponse<Array<DashboardListType>>>(`${projectID}/moving/${dashboardID}/`, {index}, {headers: this.headers})
+        return await instance.put<AxiosResponse<Array<DashboardListType>>>(
+            `${projectID}/moving/${dashboardID}/`,
+            {index},
+            {headers: getHeader()})
             .then(response => response)
-            .catch(error => error)
+            .catch(error => error.response)
     },
     async delete(projectID: number, dashboardID: number): Promise<AxiosResponse> {
         return await instance.delete<AxiosResponse<Array<DashboardListType>>>(
             `${projectID}/delete/${dashboardID}/`,
-            {headers: this.headers}
+            {headers: getHeader()}
         )
             .then(response => response)
             .catch(error => error.response)

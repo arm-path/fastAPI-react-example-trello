@@ -1,9 +1,10 @@
 import {ChangeEvent, useState} from 'react'
+
 import classes from './Profile.module.css'
 import Input from '../form/input/Input.tsx'
-import Button from '../form/button/Button.tsx';
-import {useAppDispatch} from '../../redux/hooks.ts';
-import {userUpdateThunk} from '../../redux/reducers/userReducer.ts';
+import Button from '../form/button/Button.tsx'
+import {useAppDispatch} from '../../redux/hooks.ts'
+import {userUpdateThunk} from '../../redux/reducers/userReducer.ts'
 
 
 const ProfileForm = () => {
