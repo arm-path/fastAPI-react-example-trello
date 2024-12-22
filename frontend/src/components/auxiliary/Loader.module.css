@@ -1,0 +1,62 @@
+.container {
+    margin: 35vh auto;
+    text-align: center;
+}
+
+.loader {
+    border-radius: 50%;
+    display: inline-block;
+    position: relative;
+    box-sizing: border-box;
+    animation: rotation 3s linear infinite;
+}
+
+.white {
+    border: 5px dotted #ffffff;
+}
+
+.grey {
+    border: 5px dotted #b1b4b9;
+}
+
+.black {
+    border: 5px dotted #000000;
+}
+
+.violet {
+    border: 5px dotted #917fbd;
+}
+
+.default {
+    width: 50px;
+    height: 50px;
+}
+
+.small {
+    width: 30px;
+    height: 30px;
+}
+
+.large {
+    width: 100px;
+    height: 100px;
+}
+
+.huge{
+    width: 150px;
+    height: 150px;
+}
+
+.medium {
+    width: 75px;
+    height: 75px;
+}
+
+@keyframes rotation {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}

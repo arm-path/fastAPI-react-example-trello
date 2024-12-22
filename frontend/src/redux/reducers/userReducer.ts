@@ -1,10 +1,13 @@
 import {createAsyncThunk, createSlice, PayloadAction, Slice} from '@reduxjs/toolkit'
-import UserAPI, {UserType} from '../../api/userAPI.ts'
+
+import UserAPI from '../../api/userAPI.ts'
+import userAPI, {UserDetailResponseType, UserType} from '../../api/userAPI.ts'
 import {ThunkApiConfig} from '../store.ts'
 
 
 type InitialStateType = {
     user: UserType
+    isGetUser: boolean
     isUpdateUser: boolean
 }
 
@@ -17,9 +20,18 @@ const initialState: InitialStateType = {
         is_active: false,
         is_verified: false
     },
+    isGetUser: false,
     isUpdateUser: false
 
 }
+
+export const userDetailThunk = createAsyncThunk<UserDetailResponseType, void>
+(
+    'user/detail',
+    async () => {
+        return await userAPI.detail()
+    }
+)
 
 export const userUpdateThunk = createAsyncThunk<
     UserType | undefined, { firstName: string; lastName: string }, ThunkApiConfig>
@@ -49,6 +61,17 @@ const userSlice: Slice<InitialStateType> = createSlice({
             .addCase(userUpdateThunk.fulfilled, (state, action) => {
                 if (action.payload) state.user = action.payload
                 state.isUpdateUser = false
+            })
+            .addCase(userDetailThunk.pending, (state) => {
+                state.isGetUser = true
+            })
+            .addCase(userDetailThunk.fulfilled, (state, action) => {
+                if (action.payload) {
+                    if (action.payload.status === 200) {
+                        state.user = action.payload.data as UserType
+                    }
+                }
+                state.isGetUser = false
             })
     }
 })

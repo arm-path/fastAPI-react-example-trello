@@ -279,7 +279,6 @@ const projectSlice = createSlice({
                 if (action.payload) {
                     if (action.payload.status === 200) {
                         const data = action.payload.data as BaseInvitationType
-                        console.log(data)
                         state.inviteUserForm.invite = true
                         state.inviteUserForm.email = ''
                         if (state.detail !== null) {

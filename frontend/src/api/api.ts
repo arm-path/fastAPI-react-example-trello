@@ -10,15 +10,11 @@ export type APIValidationErrorType = {
 }
 
 export type APIAuthErrorType = {
-    detail: {}
-}
-
-type BaseErrorType = {
-    msg: string,
+    detail: string
 }
 
 export type APIBaseErrorType = {
-    detail: BaseErrorType
+    detail: { msg: string }
 }
 
 export const getHeader = () => {
