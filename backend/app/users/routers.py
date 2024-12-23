@@ -48,7 +48,7 @@ async def invitation_project_accept(user: Annotated[UserRead, Depends(current_us
     return await UserService.invitation_project_accept(session, user, data.project_id)
 
 
-@router.delete('/invited-project/delete/')
+@router.post('/invited-project/delete/')
 async def invited_project_delete(user: Annotated[UserRead, Depends(current_user)],
                                  session: Annotated[AsyncSession, Depends(db_settings.get_session)],
                                  data: JoiningProjectSchema):

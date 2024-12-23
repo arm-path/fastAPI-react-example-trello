@@ -3,10 +3,12 @@ import {useEffect} from 'react'
 import classes from './Profile.module.css'
 import ProfileForm from './ProfileForm.tsx'
 import ProfileDetail from './ProfileDetail.tsx'
+import Invitations from './Invitations.tsx'
 import {useAppDispatch, useAppSelector} from '../../redux/hooks.ts'
 import {selectUser} from '../../redux/selectors.ts'
 import withAuthRedirect from '../hoc/Authentication.tsx'
 import {userDetailThunk} from '../../redux/reducers/userReducer.ts'
+
 
 const Profile = () => {
 
@@ -23,6 +25,8 @@ const Profile = () => {
         <div className={componentContainerStyle}>
             <ProfileForm/>
             <ProfileDetail/>
+            <div></div>
+            <Invitations/>
         </div>
     )
 }

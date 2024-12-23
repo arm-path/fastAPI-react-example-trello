@@ -1,7 +1,8 @@
 import {createAsyncThunk, createSlice, PayloadAction, Slice} from '@reduxjs/toolkit'
+import {AxiosResponse} from 'axios'
 
 import UserAPI from '../../api/userAPI.ts'
-import userAPI, {UserDetailResponseType, UserType} from '../../api/userAPI.ts'
+import userAPI, {InvitationProjectsType, UserDetailResponseType, UserType} from '../../api/userAPI.ts'
 import {ThunkApiConfig} from '../store.ts'
 
 
@@ -9,6 +10,14 @@ type InitialStateType = {
     user: UserType
     isGetUser: boolean
     isUpdateUser: boolean
+    invitationProjects: {
+        isGetPending: boolean,
+        list: Array<InvitationProjectsType>
+    },
+    invitationProjectAction: {
+        id: number,
+        isGetPending: boolean,
+    }
 }
 
 const initialState: InitialStateType = {
@@ -21,7 +30,15 @@ const initialState: InitialStateType = {
         is_verified: false
     },
     isGetUser: false,
-    isUpdateUser: false
+    isUpdateUser: false,
+    invitationProjects: {
+        isGetPending: false,
+        list: [],
+    },
+    invitationProjectAction: {
+        id: 0,
+        isGetPending: false,
+    }
 
 }
 
@@ -42,6 +59,33 @@ export const userUpdateThunk = createAsyncThunk<
         if (response.status === 200) {
             return response.data
         } else return undefined
+    }
+)
+
+export const getInvitationProjectsThunk = createAsyncThunk<
+    AxiosResponse<Array<InvitationProjectsType>>, void>
+(
+    'user/getInvitationProjects',
+    async () => {
+        return await UserAPI.invitationProjects()
+    }
+)
+
+export const invitationProjectAcceptThunk = createAsyncThunk<
+    AxiosResponse<Array<InvitationProjectsType>>, number>
+(
+    'user/invitationProjectAccept',
+    async (projectId: number) => {
+        return await UserAPI.invitationProjectsAccept(projectId)
+    }
+)
+
+export const invitationProjectDeleteThunk = createAsyncThunk<
+    AxiosResponse, number>
+(
+    'user/invitationProjectDelete',
+    async (projectId: number) => {
+        return await UserAPI.invitationProjectsDelete(projectId)
     }
 )
 
@@ -72,6 +116,49 @@ const userSlice: Slice<InitialStateType> = createSlice({
                     }
                 }
                 state.isGetUser = false
+            })
+            .addCase(getInvitationProjectsThunk.pending, (state) => {
+                state.invitationProjects.isGetPending = true
+            })
+            .addCase(getInvitationProjectsThunk.fulfilled, (state, action) => {
+                if (action.payload) {
+                    if (action.payload.status === 200) {
+                        state.invitationProjects.list = action.payload.data
+                    }
+                }
+                state.invitationProjects.isGetPending = false
+            })
+            .addCase(invitationProjectAcceptThunk.pending, (state, action) => {
+                state.invitationProjectAction.id = action.meta.arg
+                state.invitationProjectAction.isGetPending = true
+            })
+            .addCase(invitationProjectAcceptThunk.fulfilled, (state: InitialStateType, action) => {
+                if (action.payload) {
+                    if (action.payload.status === 200) {
+                        state.invitationProjects.list = state.invitationProjects.list.filter(
+                            (el: InvitationProjectsType): boolean => {
+                                return el.id !== action.meta.arg
+                            })
+                    }
+                }
+                state.invitationProjectAction.id = 0
+                state.invitationProjectAction.isGetPending = false
+            })
+            .addCase(invitationProjectDeleteThunk.pending, (state, action) => {
+                state.invitationProjectAction.id = action.meta.arg
+                state.invitationProjectAction.isGetPending = true
+            })
+            .addCase(invitationProjectDeleteThunk.fulfilled, (state, action) => {
+                if (action.payload) {
+                    if (action.payload.status === 200) {
+                        state.invitationProjects.list = state.invitationProjects.list.filter(
+                            (el: InvitationProjectsType): boolean => {
+                                return el.id !== action.meta.arg
+                            })
+                    }
+                }
+                state.invitationProjectAction.id = 0
+                state.invitationProjectAction.isGetPending = false
             })
     }
 })

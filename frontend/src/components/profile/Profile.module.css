@@ -22,3 +22,47 @@
 .loading {
     cursor: wait;
 }
+
+.invitationsUsersTable {
+    border-collapse: collapse;
+    border: 1px solid rgb(140 140 140);
+    font-family: sans-serif;
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+}
+
+.invitationsUsersTable thead {
+    background-color: rgb(228 240 245);
+}
+
+.invitationsUsersTable th,
+.invitationsUsersTable td {
+    border: 1px solid rgb(160 160 160);
+    padding: 8px 10px;
+}
+
+.invitationsUsersTable td:last-of-type {
+    text-align: center;
+}
+
+.invitationsUsersTable tbody > .invitationsUsersTable tr:nth-of-type(even) {
+    background-color: rgb(237 238 242);
+}
+
+.accept:hover {
+    cursor: pointer;
+    color: #ffffff;
+    background-color: #4CAF50;
+}
+
+.delete:hover {
+    cursor: pointer;
+    color: #ffffff;
+    background-color: #97327a;
+}
+
+.invitationLoading {
+    color: #ffffff;
+    background-color: #737478;
+    cursor: wait;
+}
